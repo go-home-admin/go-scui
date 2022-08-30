@@ -1,0 +1,105 @@
+syntax = "proto3";
+
+package admin;
+
+import "http_config.proto";
+
+option go_package = "github.com/go-home-admin/go-admin/generate/proto/admin";
+
+service System {
+	option (http.RouteGroup) = "admin";
+
+	// 登陆用户的菜单
+	rpc MyMenu(MyMenuRequest)returns(MyMenuResponse){
+		option (http.Get) = "/system/menu/my";
+	}
+
+	// 菜单列表
+	rpc MenuList(MenuListRequest)returns(MenuListResponse){
+		option (http.Get) = "/system/menu/list";
+	}
+	// 菜单保存
+	rpc MenuSave(MenuSaveRequest)returns(MenuSaveResponse){
+		option (http.Post) = "/system/menu/save";
+	}
+	// 菜单删除
+	rpc MenuDel(MenuDelRequest)returns(MenuDelResponse){
+		option (http.Delete) = "/system/menu/del";
+	}
+}
+
+message MenuDelRequest {
+	repeated uint32 ids = 1;
+}
+message MenuDelResponse {}
+
+message MenuSaveRequest {
+	uint32 id = 1;
+	uint32 parentId = 2;
+	string name = 3;
+	string path = 4;
+	Meta meta = 5;
+	repeated ApiList apiList = 6;
+	string component = 7;
+}
+message MenuSaveResponse {
+	// 创建返回新id
+	uint32 id = 1;
+}
+
+message MenuListRequest {}
+message MenuListResponse {
+	repeated MenuInfo list = 1;
+}
+
+message MenuInfo {
+	uint32 id = 1;
+	uint32 parentId = 2;
+	string name = 3;
+	string path = 4;
+	Meta meta = 5;
+	repeated ApiList apiList = 6;
+	string component = 7;
+	repeated MenuInfo children = 8;
+	// 重定向
+	string redirect = 9;
+	// 菜单高亮
+	string active = 10;
+}
+message ApiList {
+	string code = 1;
+	string url = 2;
+}
+
+
+message MyMenuRequest {}
+
+message MyMenuResponse {
+	repeated Menu menu = 1;
+	repeated string permissions = 2;
+}
+
+message Meta {
+	// 显示名称
+	string title = 1;
+	// 图标
+	string icon = 2;
+	// 类型
+	string type = 3;
+	// 固定
+	bool affix = 4;
+	// 隐藏面包屑
+	bool hiddenBreadcrumb = 5;
+	// 隐藏菜单
+	bool hidden = 6;
+	// 颜色
+	string color = 7;
+}
+
+message Menu {
+	string name = 1;
+	string path = 2;
+	Meta meta = 3;
+	string component = 4;
+	repeated Menu children = 6;
+}

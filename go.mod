@@ -9,7 +9,7 @@ require (
 	github.com/gin-gonic/gin v1.7.7
 	github.com/go-home-admin/home v0.3.4
 	github.com/sirupsen/logrus v1.8.1
-	google.golang.org/protobuf v1.28.0
+	google.golang.org/protobuf v1.28.1
 	gorm.io/gorm v1.23.4
 )
 

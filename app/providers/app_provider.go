@@ -1,6 +1,7 @@
 package providers
 
 import (
+	"github.com/go-home-admin/go-admin/web"
 	"github.com/go-home-admin/home/bootstrap/constraint"
 	"github.com/go-home-admin/home/bootstrap/providers"
 	"github.com/go-home-admin/home/bootstrap/services"
@@ -17,6 +18,9 @@ type App struct {
 
 	*Route    `inject:""`
 	*Response `inject:""`
+
+	*web.Web     `inject:""`
+	*web.Swaager `inject:""`
 }
 
 func (a *App) Run(servers []constraint.KernelServer) {

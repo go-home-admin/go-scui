@@ -20,6 +20,6 @@ func (c *ApiRoutes) GetGroup() string {
 func (c *ApiRoutes) GetRoutes() map[*api.Config]func(c *gin.Context) {
 	return map[*api.Config]func(c *gin.Context){
 		api.Get("/api/demo"): c.api_demo.GinHandleHome,
-		api.Get("/"):         c.public.GinHandleHome,
+		api.Get("/version"):  c.public.GinHandleHome,
 	}
 }

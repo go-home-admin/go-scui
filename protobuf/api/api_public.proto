@@ -9,9 +9,9 @@ option go_package = "github.com/go-home-admin/go-admin/generate/proto/api";
 service Public {
   option (http.RouteGroup) = "api";
 
-  // 首页
+  // version
   rpc Home(HomeRequest)returns(HomeResponse){
-    option (http.Get) = "/";
+    option (http.Get) = "/version";
   }
 }
 

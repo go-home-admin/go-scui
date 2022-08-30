@@ -1,0 +1,81 @@
+// @Tag("binding","required")
+syntax = "proto3";
+
+package admin;
+
+import "http_config.proto";
+
+option go_package = "github.com/go-home-admin/go-admin/generate/proto/admin";
+
+service AdminUser {
+	option (http.RouteGroup) = "admin";
+
+	// 登陆账户信息
+	rpc Info(InfoRequest)returns(InfoResponse){
+		option (http.Get) = "/info";
+	}
+
+	// 用户列表
+	rpc User(UserRequest)returns(UserResponse){
+		option (http.Get) = "/admin/user";
+	}
+
+	// 用户创建
+	rpc UserAdd(UserAddRequest)returns(UserAddResponse){
+		option (http.Post) = "/admin/user";
+	}
+
+	// 用户删除
+	rpc UserDel(UserDelRequest)returns(UserDelResponse){
+		option (http.Delete) = "/admin/user";
+	}
+}
+
+message UserAddRequest {
+	uint32 id = 1;
+	string name = 2;
+	string password = 3;
+	string userName = 4;
+}
+message UserAddResponse {}
+
+message UserDelRequest {
+	uint32 id = 1;
+}
+message UserDelResponse {}
+
+message UserRequest {
+	int64 page = 1;
+	int64 pageSize = 2;
+	int64 prop = 3;
+	int64 order = 4;
+}
+message UserResponse {
+	int64 page = 1;
+	int64 pageSize = 2;
+	repeated AdminUserInfo rows = 3;
+	int64 total = 4;
+}
+
+message AdminUserInfo {
+	uint32 id = 1;
+	string name = 2;
+	string username = 3;
+	string create_at = 4;
+}
+
+message InfoRequest{
+	// @Tag("json")
+	uint32 id = 1;
+}
+
+message InfoResponse{
+	// 名称
+	string name = 1; // test
+	// 头像
+	string avatar = 2;
+	// 描述
+	string introduction = 3;
+	// 角色名称列表
+	repeated string roles = 4;
+}
