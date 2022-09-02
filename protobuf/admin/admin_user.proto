@@ -4,6 +4,7 @@ syntax = "proto3";
 package admin;
 
 import "http_config.proto";
+import "table.proto";
 
 option go_package = "github.com/go-home-admin/go-admin/generate/proto/admin";
 
@@ -16,7 +17,7 @@ service AdminUser {
 	}
 
 	// 用户列表
-	rpc User(UserRequest)returns(UserResponse){
+	rpc User(guid.TableRequest)returns(guid.TableResponse){
 		option (http.Get) = "/admin/user";
 	}
 
@@ -43,19 +44,6 @@ message UserDelRequest {
 	uint32 id = 1;
 }
 message UserDelResponse {}
-
-message UserRequest {
-	int64 page = 1;
-	int64 pageSize = 2;
-	int64 prop = 3;
-	int64 order = 4;
-}
-message UserResponse {
-	int64 page = 1;
-	int64 pageSize = 2;
-	repeated AdminUserInfo rows = 3;
-	int64 total = 4;
-}
 
 message AdminUserInfo {
 	uint32 id = 1;

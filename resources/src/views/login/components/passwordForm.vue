@@ -31,6 +31,8 @@
 </template>
 
 <script>
+	import {getMenu} from "@/api/model/menu";
+
 	export default {
 		data() {
 			return {
@@ -89,12 +91,8 @@
 					return false
 				}
 				//获取菜单
-				var menu = null
-				if(this.form.user == 'admin'){
-					menu = await this.$API.system.menu.myMenus.get()
-				}else{
-					menu = await this.$API.demo.menu.get()
-				}
+				var menu = getMenu()
+
 				if(menu.code == 200){
 					if(menu.data.menu.length==0){
 						this.islogin = false

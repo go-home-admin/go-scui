@@ -2,47 +2,12 @@
 	<el-container>
 		<el-header>
 			<div class="left-panel">
-				<el-button icon="el-icon-Filter" @click="add">筛选</el-button>
-			</div>
-			<div class="right-panel">
-				<div class="right-panel-search">
-					<el-button type="primary" icon="el-icon-plus" @click="add">新增</el-button>
-					<el-dropdown split-button type="primary">
-						导出
-						<template #dropdown>
-							<el-dropdown-menu>
-								<el-dropdown-item>全部</el-dropdown-item>
-								<el-dropdown-item>当前页</el-dropdown-item>
-								<el-dropdown-item>选中的行</el-dropdown-item>
-							</el-dropdown-menu>
-						</template>
-					</el-dropdown>
-					<el-button type="danger" plain icon="el-icon-delete" :disabled="selection.length==0" @click="batch_del"></el-button>
-				</div>
+				<el-button type="primary" icon="el-icon-plus" @click="add"></el-button>
+				<el-button type="primary" icon="el-icon-plus" @click="addPage">页面新增</el-button>
+				<el-button type="danger" plain icon="el-icon-delete" :disabled="selection.length==0" @click="batch_del"></el-button>
 			</div>
 		</el-header>
 		<el-main class="nopadding">
-			<div style="margin: 15px 0px 0px 0px; border-bottom: 1px solid var(--el-border-color-light);">
-				<el-row>
-					<el-col :span="24">
-						<el-form :model="form" label-width="120px">
-							<el-form-item label="Activity name">
-								<el-input v-model="form.name" />
-							</el-form-item>
-							<el-form-item label="Activity zone">
-								<el-select v-model="form.region" placeholder="please select your zone">
-									<el-option label="Zone one" value="shanghai" />
-									<el-option label="Zone two" value="beijing" />
-								</el-select>
-							</el-form-item>
-							<el-form-item>
-								<el-button type="primary" @click="onSubmit">搜索</el-button>
-								<el-button>重置</el-button>
-							</el-form-item>
-						</el-form>
-					</el-col>
-				</el-row>
-			</div>
 			<scTable ref="table" :apiObj="list.apiObj" row-key="id" @selection-change="selectionChange" stripe>
 				<el-table-column type="selection" width="50"></el-table-column>
 				<el-table-column label="姓名" prop="name" width="180"></el-table-column>
@@ -59,22 +24,12 @@
 					<template #default="scope">
 						<el-button plain size="small" @click="table_show(scope.row)">查看</el-button>
 						<el-button type="primary" plain size="small" @click="table_edit(scope.row)">编辑</el-button>
+						<el-button type="primary" plain size="small" @click="table_edit_page(scope.row)">页面编辑</el-button>
 						<el-popconfirm title="确定删除吗？" @confirm="table_del(scope.row, scope.$index)">
 							<template #reference>
 								<el-button plain type="danger" size="small">删除</el-button>
 							</template>
 						</el-popconfirm>
-						<el-dropdown>
-							<el-button icon="el-icon-more" size="small"></el-button>
-							<template #dropdown>
-								<el-dropdown-menu>
-									<el-dropdown-item>配额</el-dropdown-item>
-									<el-dropdown-item divided>重启</el-dropdown-item>
-									<el-dropdown-item >停机</el-dropdown-item>
-									<el-dropdown-item divided>释放主机</el-dropdown-item>
-								</el-dropdown-menu>
-							</template>
-						</el-dropdown>
 					</template>
 				</el-table-column>
 			</scTable>
@@ -108,21 +63,13 @@
 				list: {
 					apiObj: this.$API.demo.list
 				},
-				selection: [],
-				form: {
-					name: '',
-					region: '',
-				}
+				selection: []
 			}
 		},
 		mounted() {
 
 		},
 		methods: {
-			//点击筛选按钮
-			onFilter() {
-
-			},
 			//窗口新增
 			add(){
 				this.dialog.save = true
@@ -141,6 +88,15 @@
 			addPage(){
 				this.$router.push({
 					path: '/template/list/crud/detail',
+				})
+			},
+			//页面编辑
+			table_edit_page(row){
+				this.$router.push({
+					path: '/template/list/crud/detail',
+					query: {
+						id: row.id
+					}
 				})
 			},
 			//查看

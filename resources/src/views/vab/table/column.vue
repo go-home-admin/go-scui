@@ -31,7 +31,8 @@
 						{
 							label: "姓名",
 							prop: "name",
-							width: "150"
+							width: "150",
+							html:'<div>fdsafsda<fdsa></div>'
 						},
 						{
 							label: "性别",

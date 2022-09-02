@@ -16,14 +16,13 @@ func (k *Kernel) Init() {
 	k.Middleware = []gin.HandlerFunc{
 		gin.Logger(),
 		gin.Recovery(),
+		Cors(),
 	}
 
 	// 分组中间件, 在路由提供者中自行设置
 	k.MiddlewareGroup = map[string][]gin.HandlerFunc{
-		"admin": {
-			Cors(),
-		},
-		"api": {},
+		"admin": {},
+		"api":   {},
 	}
 }
 
