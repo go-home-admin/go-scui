@@ -1,6 +1,8 @@
 package guid_scui
 
-import "github.com/go-home-admin/go-admin/generate/proto/common/guid"
+import (
+	"github.com/go-home-admin/go-admin/generate/proto/common/guid"
+)
 
 type Table struct {
 	columns []*guid.Column
@@ -49,5 +51,10 @@ func (c *Column) Sortable(v bool) *Column {
 
 func (c *Column) Filters(v []*guid.Filter) *Column {
 	c.Column.Filters = v
+	return c
+}
+
+func (c *Column) Template(v string) *Column {
+	c.Column.Template = v
 	return c
 }

@@ -18,13 +18,20 @@ message TableResponse {
 }
 
 message Column {
+	// 名称
 	string label = 1;
+	// 字段
 	string prop = 2;
+	// 宽度
 	string width = 3;
+	// 是否隐藏
 	bool hide = 4;
+	// 是否开启排序
 	bool sortable = 5;
+	// 状态翻译
 	repeated Filter filters = 6;
-
+	// Vue 模板
+	string Template = 10;
 }
 
 message TableData {
