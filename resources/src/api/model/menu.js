@@ -16,9 +16,14 @@ export function getMenu() {
 					"meta": {"title": "帐号信息", "icon": "el-icon-user", "tag": "NEW"},
 					"component": "userCenter"
 				}, {
-					"name": "自动的表单",
-					"path": "/guid",
-					"meta": {"title": "自动的表单", "icon": "el-icon-user", "tag": "NEW"},
+					"name": "自动的表单11",
+					"path": "/admin/user",
+					"meta": {"title": "自动的表单1", "icon": "el-icon-user", "tag": "NEW"},
+					"component": "guid"
+				}, {
+					"name": "自动的表单2",
+					"path": "/guid/ff",
+					"meta": {"title": "自动的表单2", "icon": "el-icon-user"},
 					"component": "guid"
 				}]
 			}, {

@@ -4,7 +4,6 @@ syntax = "proto3";
 package admin;
 
 import "http_config.proto";
-import "table.proto";
 
 option go_package = "github.com/go-home-admin/go-admin/generate/proto/admin";
 
@@ -14,11 +13,6 @@ service AdminUser {
 	// 登陆账户信息
 	rpc Info(InfoRequest)returns(InfoResponse){
 		option (http.Get) = "/info";
-	}
-
-	// 用户列表
-	rpc User(guid.TableRequest)returns(guid.TableResponse){
-		option (http.Get) = "/admin/user";
 	}
 
 	// 用户创建

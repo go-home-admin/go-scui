@@ -1,34 +1,40 @@
 <template>
-	<login-popup />
+	<load-sync-views/>
 </template>
 
 <script>
-	import {GetAdminUser} from "@/api/model/admin_user";
-	import { defineAsyncComponent } from 'vue/dist/vue.esm-bundler.js'
+import {loadTableView} from "@/api/model/load";
+import {defineAsyncComponent} from 'vue'
+import {useRouter} from 'vue-router'
+import config from "@/config"
+import http from "@/api/http"
 
+export default {
+	name: 'sync',
+	components: {
+		"loadSyncViews": defineAsyncComponent(
+			() =>
+				new Promise((resolve) => {
+					loadTableView(useRouter().currentRoute._rawValue.path).then(res => {
+						let com = res.data
 
-	export default {
-		name: 'tableCustomColumn',
-		components: {
-			"LoginPopup" :  defineAsyncComponent(
-				() =>
-					new Promise((resolve) => {
-						GetAdminUser().then(res=>{
-							console.log(res)
-							resolve({
-								template: " <el-progress :percentage=\"100\" status=\"success\" />",
-							});
+						resolve({
+							// props: com.props ? eval("(" + com.props + ")") : {},
+							template: com.template,
+							data() {
+								return eval("(" + com.data + ")")
+							},
+							methods: com.methods ? eval("(" + com.methods + ")") : {},
+							mounted() {
+								this.config = config
+								this.http = http
+
+								com.mounted ? eval(com.mounted) : {}
+							},
 						});
-					})
-			)
-		},
-		data() {
-			return {
-				show: false
-			}
-		}
+					});
+				})
+		)
 	}
+}
 </script>
-
-<style>
-</style>

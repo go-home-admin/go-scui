@@ -2,20 +2,14 @@ default: mysql
 
 # 所有数据库连接
 connections:
-#  mysql:
-#    driver: mysql
-#    host: env("DB_HOST", "127.0.0.1")
-#    port: env("DB_PORT", "3306")
-#    database: env("DB_DATABASE", "home-mysql")
-#    username: env("DB_USERNAME", "root")
-#    password: env("DB_PASSWORD", "123456")
-#    # 生成orm辅助关系
-#    helper:
-#      admin_menu:
-#        - with: belongs_to
-#          table: admin_role_menu
-#          alias: AdminRoleMenu
-#          gorm: "foreignKey:id;references:menu_id"
+  mysql:
+    driver: mysql
+    host: env("DB_HOST", "127.0.0.1")
+    port: env("DB_PORT", "3306")
+    database: env("DB_DATABASE", "home-mysql")
+    username: env("DB_USERNAME", "root")
+    password: env("DB_PASSWORD", "123456")
+
 #
 #  redis:
 #    driver: redis

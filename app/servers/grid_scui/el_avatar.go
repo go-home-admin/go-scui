@@ -1,4 +1,4 @@
-package guid_scui
+package grid_scui
 
 import "strings"
 

@@ -1,0 +1,87 @@
+syntax = "proto3";
+
+package grid;
+
+import "google/protobuf/descriptor.proto";
+import "any.proto";
+
+option go_package = "github.com/go-home-admin/go-admin/generate/proto/common/grid";
+// 列表页面
+message IndexRequest {}
+// 这里应该输出一个完整的组件格式
+message IndexResponse {
+	// 这里是同平常一样的 Vue 组件选项
+	string template = 1;
+	// 组件数据
+	string data = 2;
+	// js 函数 {}
+	string methods = 3;
+	// js 执行代码
+	string mounted = 4;
+}
+// 列表数据
+message ListRequest {
+	// 页码
+	int64 page = 1;
+	// 分页大小
+	int64 pageSize = 2;
+	// 搜索条件
+	repeated home.protobuf.Any from = 3;
+}
+message ListResponse {
+	// 页码
+	int64 page = 1;
+	// 分页大小
+	int64 pageSize = 2;
+	//分析行数据字段结构
+	repeated home.protobuf.Any rows = 3;
+	//分析总数字段结构
+	uint64 total = 4;
+	//分析合计行字段结构
+	uint64 summary = 5;
+}
+
+// 列表导出
+message ExportRequest {
+	// 页码
+	int64 page = 1;
+	// 分页大小
+	int64 pageSize = 2;
+	// 搜索条件
+	home.protobuf.Any from = 3;
+}
+message ExportResponse {}
+// 创建数据的页面
+message CreateRequest {}
+message CreateResponse {}
+// 提交创建的数据
+message StoreRequest {}
+message StoreResponse {}
+// 编辑数据的页面
+message EditRequest {}
+message EditResponse {}
+// 提交编辑的数据
+message UpdateRequest {}
+message UpdateResponse {}
+
+message Column {
+	// 名称
+	string label = 1;
+	// 字段
+	string prop = 2;
+	// 宽度
+	string width = 3;
+	// 是否隐藏
+	bool hide = 4;
+	// 是否开启排序
+	bool sortable = 5;
+	// 状态翻译
+	repeated Filter filters = 6;
+	// Vue 模板
+	string Template = 10;
+}
+
+message Filter {
+	string text = 3;
+	string value = 4;
+}
