@@ -15,12 +15,26 @@ type Table struct {
 	columns []*grid.Column
 	uri     string
 	req     *grid.ListRequest
+	// [函数名称]代码
+	MethodsRender map[string]func(*Table) string
+	MountedRender map[string]func(*Table) string
 }
 
 func NewTable(db *gorm.DB) *Table {
 	return &Table{
 		db:      db,
 		columns: make([]*grid.Column, 0),
+		uri:     "",
+		req:     nil,
+		MethodsRender: map[string]func(*Table) string{
+			"get": func(*Table) string {
+				return "async function(params){\n\t\treturn await this.http.get(this.url, params);\n\t}"
+			},
+			"post": func(*Table) string {
+				return "async function(params){\n\t\treturn await this.http.post(this.url, params);\n\t}"
+			},
+		},
+		MountedRender: nil,
 	}
 }
 
@@ -93,13 +107,29 @@ func (g *Table) GetTemplate() string {
 	return vTable
 }
 
+// AddMethods js函数定义
+func (g *Table) AddMethods(name string, fun func(*Table) string) {
+	if _, ok := g.MethodsRender[name]; !ok {
+		g.MethodsRender[name] = fun
+	}
+}
+
+// AddMethodsCode js函数定义
+func (g *Table) AddMethodsCode(name string, code string) {
+	if _, ok := g.MethodsRender[name]; !ok {
+		g.MethodsRender[name] = func(table *Table) string {
+			return code
+		}
+	}
+}
+
+// GetMethods 获取所有js函数定义
 func (g *Table) GetMethods() string {
-	return `{
-	get: async function(params){
-		console.log(this.url)
-		return await this.http.get(this.url, params);
-	},
-}`
+	str := "{\n"
+	for s, f := range g.MethodsRender {
+		str = str + "\n" + s + ":" + f(g) + ",\n"
+	}
+	return str + "\n}"
 }
 
 func (g *Table) GetMounted() string {
