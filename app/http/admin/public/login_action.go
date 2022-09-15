@@ -8,8 +8,15 @@ import (
 
 // Login   登陆
 func (receiver *Controller) Login(req *admin.LoginRequest, ctx http.Context) (*admin.LoginResponse, error) {
-	// TODO 这里写业务
-	return &admin.LoginResponse{}, nil
+	return &admin.LoginResponse{
+		Token: "123",
+		UserInfo: &admin.Userinfo{
+			UserId:    "admin",
+			UserName:  "admin",
+			Dashboard: "admin",
+			Role:      nil,
+		},
+	}, nil
 }
 
 // GinHandleLogin gin原始路由处理

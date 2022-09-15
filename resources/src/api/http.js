@@ -1,8 +1,7 @@
-import config from "@/config";
 import axios from "axios";
 
 function toUrl (url) {
-	return config.API_URL + url
+	return url
 }
 
 var http = {
@@ -12,6 +11,7 @@ var http = {
 	 * @param  {参数} config
 	 */
 	get: function(url, params={}, config={}) {
+		console.log(url)
 		return new Promise((resolve, reject) => {
 			axios({
 				method: 'get',

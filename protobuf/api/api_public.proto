@@ -7,17 +7,17 @@ import "http_config.proto";
 option go_package = "github.com/go-home-admin/go-admin/generate/proto/api";
 
 service Public {
-  option (http.RouteGroup) = "api";
+	option (http.RouteGroup) = "api";
 
-  // version
-  rpc Home(HomeRequest)returns(HomeResponse){
-    option (http.Get) = "/version";
-  }
+	// version
+	rpc Home(HomeRequest)returns(HomeResponse){
+		option (http.Get) = "/version";
+	}
 }
 
 message HomeRequest {}
 
 message HomeResponse {
-  string start_time = 1;
-  string tip = 2;
+	string start_time = 1;
+	string tip = 2;
 }

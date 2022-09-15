@@ -17,7 +17,7 @@ export function getMenu() {
 					"component": "userCenter"
 				}, {
 					"name": "自动的表单11",
-					"path": "/admin/user",
+					"path": "/user",
 					"meta": {"title": "自动的表单1", "icon": "el-icon-user", "tag": "NEW"},
 					"component": "guid"
 				}, {

@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"encoding/json"
 	"github.com/go-home-admin/go-admin/generate/proto/common/grid"
+	"github.com/go-home-admin/home/app"
 	"github.com/go-home-admin/home/protobuf"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -137,7 +138,7 @@ func (g *Table) GetMounted() string {
 }
 
 func (g *Table) SetUri(v string) {
-	g.uri = v
+	g.uri = app.Config("app.url", "http:127.0.0.1:8080") + v
 }
 
 func (g *Table) GetData() string {

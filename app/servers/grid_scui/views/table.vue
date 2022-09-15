@@ -9,8 +9,7 @@
     </div>
   </el-header>
   <el-main class="nopadding">
-    <scTable ref="table" tableName="listCustomColumn" :apiObj="this" :column="columns"
-             row-key="id" stripe>
+    <scTable ref="table" tableName="listCustomColumn" :apiObj="{get: get}" :column="columns" row-key="id" stripe>
       <el-table-column type="selection" width="50"></el-table-column>
       <template #progress="scope">
         <el-progress :percentage="scope.row.progress"/>

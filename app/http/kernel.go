@@ -1,6 +1,7 @@
 package http
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/go-home-admin/home/bootstrap/constraint"
 	"github.com/go-home-admin/home/bootstrap/servers"
@@ -23,6 +24,12 @@ func (k *Kernel) Init() {
 		"admin": {},
 		"api":   {},
 	}
+
+	k.SetTrustedProxies(nil)
+}
+
+func (k Kernel) Boot() {
+	fmt.Printf("Please check http://127.0.0.1:%v\n", k.Port)
 }
 
 // GetServer 提供统一命名规范的独立服务
