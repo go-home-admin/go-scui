@@ -8,13 +8,13 @@ import (
 
 // List   列表数据
 func (receiver *Controller) List(req *grid.ListRequest, ctx http.Context) (*grid.ListResponse, error) {
-	table := receiver.NewGridTable(req)
-	datas, total := table.Paginate()
+	table := receiver.NewGridTable(ctx)
+	data, total := table.Paginate()
 
 	return &grid.ListResponse{
 		Page:     req.Page,
 		PageSize: req.PageSize,
-		Rows:     datas,
+		Rows:     data,
 		Total:    uint64(total),
 		Summary:  0,
 	}, nil

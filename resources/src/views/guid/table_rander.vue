@@ -1,5 +1,7 @@
 <template>
-	<cmp :json="json"></cmp>
+	<cmp :json="json">
+
+	</cmp>
 </template>
 
 <script>

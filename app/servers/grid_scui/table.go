@@ -3,30 +3,38 @@ package grid_scui
 import (
 	_ "embed"
 	"encoding/json"
+	"github.com/gin-gonic/gin"
 	"github.com/go-home-admin/go-admin/generate/proto/common/grid"
 	"github.com/go-home-admin/home/app"
+	"github.com/go-home-admin/home/app/http"
 	"github.com/go-home-admin/home/protobuf"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
+	"io/ioutil"
+	"os"
+	"strconv"
 )
 
 type Table struct {
+	http.Context
+
 	db *gorm.DB
 	// 存储列表信息
 	columns []*grid.Column
 	uri     string
-	req     *grid.ListRequest
+
+	filter *Search
 	// [函数名称]代码
 	MethodsRender map[string]func(*Table) string
 	MountedRender map[string]func(*Table) string
 }
 
-func NewTable(db *gorm.DB) *Table {
+func NewTable(ctx http.Context, db *gorm.DB) *Table {
 	return &Table{
+		Context: ctx,
 		db:      db,
 		columns: make([]*grid.Column, 0),
 		uri:     "",
-		req:     nil,
 		MethodsRender: map[string]func(*Table) string{
 			"get": func(*Table) string {
 				return "async function(params){\n\t\treturn await this.http.get(this.url, params);\n\t}"
@@ -39,17 +47,28 @@ func NewTable(db *gorm.DB) *Table {
 	}
 }
 
+func GetInt(ctx *gin.Context, k string, def int) int {
+	v := ctx.Query(k)
+	if v == "" {
+		return def
+	}
+	i, err := strconv.Atoi(v)
+	if err != nil {
+		logrus.Error("GetInt", err)
+		return 0
+	}
+	return i
+}
+
 func (g *Table) Paginate() ([]*protobuf.Any, int64) {
 	var total int64
 	list := make([]map[string]interface{}, 0)
 	g.db.Count(&total)
 	if total > 0 {
-		if g.req.Page == 0 {
-			g.req.Page = 1
-		}
-
-		offset := (g.req.Page - 1) * g.req.PageSize
-		tx := g.db.Offset(int(offset)).Limit(int(g.req.PageSize)).Find(&list)
+		Page := GetInt(g.Gin(), "page", 1)
+		PageSize := GetInt(g.Gin(), "page", 20)
+		offset := (Page - 1) * PageSize
+		tx := g.db.Offset(int(offset)).Limit(PageSize).Find(&list)
 		if tx.Error != nil {
 			logrus.Error(tx.Error)
 		}
@@ -71,11 +90,9 @@ func (g *Table) ToResponse() *grid.IndexResponse {
 	}
 }
 
-func (g *Table) Search(req ...*grid.ListRequest) *Search {
-	if len(req) != 0 {
-		g.req = req[0]
-	}
-	return &Search{}
+func (g *Table) Search() *Search {
+	g.filter = &Search{}
+	return g.filter
 }
 
 func (g *Table) Column(label string, prop string) *Column {
@@ -105,6 +122,13 @@ func (g *Table) GetColumn() []*grid.Column {
 var vTable string
 
 func (g *Table) GetTemplate() string {
+	if app.IsDebug() {
+		if _, err := os.Stat("app/servers/grid_scui/views/table.vue"); err == nil {
+			v, _ := ioutil.ReadFile("app/servers/grid_scui/views/table.vue")
+			vTable = string(v)
+		}
+	}
+
 	return vTable
 }
 
@@ -142,10 +166,16 @@ func (g *Table) SetUri(v string) {
 }
 
 func (g *Table) GetData() string {
-	str, err := json.Marshal(map[string]interface{}{
+	data := map[string]interface{}{
 		"columns": g.GetColumn(),
 		"url":     g.uri,
-	})
+	}
+
+	if g.filter != nil {
+		data["filter"] = g.filter.ToString()
+	}
+
+	str, err := json.Marshal(data)
 	if err != nil {
 		logrus.Error(err)
 	}

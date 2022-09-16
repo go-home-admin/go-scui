@@ -9,7 +9,7 @@ import (
 
 // Index   列表页面
 func (receiver *Controller) Index(req *grid.IndexRequest, ctx http.Context) (*grid.IndexResponse, error) {
-	table := receiver.NewGridTable()
+	table := receiver.NewGridTable(ctx)
 	table.SetUri(strings.Replace(ctx.Gin().Request.RequestURI, "?", "/list?", 1))
 	return table.ToResponse(), nil
 }

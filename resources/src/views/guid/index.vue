@@ -17,7 +17,7 @@ export default {
 				new Promise((resolve) => {
 					loadTableView(useRouter().currentRoute._rawValue.path).then(res => {
 						let com = res.data
-						resolve({
+						let view = {
 							// props: com.props ? eval("(" + com.props + ")") : {},
 							template: com.template,
 							data() {
@@ -33,7 +33,9 @@ export default {
 							mounted() {
 								com.mounted ? eval(com.mounted) : {}
 							},
-						});
+						}
+						console.log(view, eval("(" + com.data + ")"))
+						resolve(view);
 					});
 				})
 		)
