@@ -19,9 +19,14 @@ func (receiver Controller) NewGridTable(ctx http.Context) *grid_scui.Table {
 	table.Column("注册时间", "datetime").Width("150").Sortable(true)
 	table.Column("进度", "progress").Avatar()
 
+	action := table.RowAction()
+	action.Add()
+	// 设置搜索栏
 	filter := table.Search()
+	filter.LabelWidth = "120px"
 	filter.Input("name", "名称").Placeholder("这里是提示语").Span(12)
 	filter.Input("nick", "昵称").Span(12)
+	filter.Input("nick2", "xvsasf").Span(6)
 
 	return table
 }

@@ -26,7 +26,7 @@ export default {
 										config,
 										http
 									},
-									eval("(" + com.data + ")")
+									com.data
 								)
 							},
 							methods: com.methods ? eval("(" + com.methods + ")") : {},

@@ -24,6 +24,7 @@ type Table struct {
 	uri     string
 
 	filter *Search
+	action *RowAction
 	// [函数名称]代码
 	MethodsRender map[string]func(*Table) string
 	MountedRender map[string]func(*Table) string
@@ -84,12 +85,18 @@ func (g *Table) Paginate() ([]*protobuf.Any, int64) {
 func (g *Table) ToResponse() *grid.IndexResponse {
 	return &grid.IndexResponse{
 		Template: g.GetTemplate(),
-		Data:     g.GetData(),
+		Data:     protobuf.NewAny(g.GetData()),
 		Methods:  g.GetMethods(),
 		Mounted:  g.GetMounted(),
 	}
 }
 
+func (g *Table) RowAction() *RowAction {
+	g.action = &RowAction{}
+	return g.action
+}
+
+// Search 返回搜索栏
 func (g *Table) Search() *Search {
 	g.filter = &Search{}
 	return g.filter

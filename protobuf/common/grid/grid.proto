@@ -13,7 +13,7 @@ message IndexResponse {
 	// 这里是同平常一样的 Vue 组件选项
 	string template = 1;
 	// 组件数据
-	string data = 2;
+	home.protobuf.Any data = 2;
 	// js 函数 {}
 	string methods = 3;
 	// js 执行代码

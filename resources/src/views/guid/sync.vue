@@ -1,5 +1,6 @@
 <template>
 	<load-views />
+	<slot #id=""/>
 </template>
 
 <script>
