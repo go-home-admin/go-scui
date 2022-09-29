@@ -21,10 +21,7 @@ type Table struct {
 	columns []*grid.Column
 	uri     string
 
-	filter *Search
 	action *RowAction
-	// [函数名称]代码
-	MethodsRender map[string]func(*Table) string
 }
 
 func NewTable(ctx http.Context, db *gorm.DB) *Table {
@@ -82,20 +79,17 @@ func (g *Table) ToResponse() *grid.IndexResponse {
 	}
 }
 
+// NewAction 列操作
 func (g *Table) NewAction() *RowAction {
 	action := &RowAction{Context: g.Context, t: g}
 	return action
 }
 
-// Search 返回搜索栏
-func (g *Table) Search() *Search {
-	g.filter = &Search{
-		Form: Form{
-			LabelWidth:    "130px",
-			LabelPosition: "right",
-		},
-	}
-	return g.filter
+// NewSearch 返回搜索栏
+func (g *Table) NewSearch() *Search {
+	form := NewTableSearch(g.Context)
+	g.View.AddRender(form, "search", "filter")
+	return form
 }
 
 func (g *Table) Column(label string, prop string) *Column {
@@ -133,9 +127,6 @@ func (g *Table) GetUri() string {
 }
 
 func (g *Table) GetData() map[string]interface{} {
-	if g.filter != nil {
-		g.View.AddData("filter", g.filter.ToString())
-	}
 	g.View.AddData("columns", g.GetColumn())
 	g.View.AddData("url", g.GetUri())
 

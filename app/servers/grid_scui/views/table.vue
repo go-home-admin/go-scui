@@ -8,13 +8,9 @@
     <el-alert title="请在右下角第二个按钮体验自定义列" type="warning" :closable="false"/>
   </div>
 </el-header>
-<div v-if="filter.config.length !==0"
-     style="border-bottom:0.8px solid #dcdfe6;background-color: #ffffff;padding: 13px 15px">
+<div v-if="filter.config.length !==0" style="border-bottom:0.8px solid #dcdfe6;background-color: #ffffff;padding: 13px 15px">
   <el-container>
-    <sc-form ref="formref" :config="filter.config" v-model="filter.form" :loading="filter.loading" style="width: 100%">
-      <el-button type="primary">搜 索</el-button>
-      <el-button>重 置</el-button>
-    </sc-form>
+    <slot id="search"/>
   </el-container>
 </div>
 
@@ -23,7 +19,7 @@
     <el-table-column type="selection" width="50"></el-table-column>
 
     <el-table-column label="操作" fixed="right" align="right" width="300">
-      <template #default="scope">
+      <template #default="{row}">
         <slot id="actions"/>
       </template>
     </el-table-column>

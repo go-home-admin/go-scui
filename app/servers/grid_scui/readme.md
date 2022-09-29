@@ -1,7 +1,14 @@
+# 设计规则
+view    试图, 需要又vue文件，设计插槽
+Render  组件，可以任何东西，放入到view的插槽
+
 # 固定插槽
-<slot id="f" />
+("/>)不支持有空格
+
+    <slot id="Render的名称"/>
 
 # 全局对象
+任意地方都可以调用的对象代码
 
     $API {admin_user: undefined, auth: {…}, common: {…}, demo: {…}, load: undefined, …}
     $AUTH ƒ permission(data)

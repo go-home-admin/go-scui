@@ -15,7 +15,7 @@ export default {
 				new Promise((resolve) => {
 					loadTableView(useRouter().currentRoute._rawValue.path).then(res => {
 						let com = res.data
-
+						console.log(com)
 						let view = {
 							template: com.template,
 							data() {

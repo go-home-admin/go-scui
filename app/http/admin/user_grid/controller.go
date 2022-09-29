@@ -22,7 +22,7 @@ func (receiver Controller) NewGridTable(ctx http.Context) *grid_scui.Table {
 	action := table.NewAction()
 	action.AddButton("删除").Confirm("/del?id={{ row.id }}")
 	// 设置搜索栏
-	filter := table.Search()
+	filter := table.NewSearch()
 	filter.LabelWidth = "120px"
 	filter.Input("name", "名称").Placeholder("这里是提示语").Span(12)
 	filter.Input("nick", "昵称").Span(12)

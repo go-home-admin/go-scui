@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/go-home-admin/home/app"
 	uuid "github.com/satori/go.uuid"
+	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -30,7 +31,8 @@ type Render struct {
 	id string
 	// template 里面的内容如果存在#__ID__, 那么会替换成成组件id
 	// 如果需要插槽, 可以使用<name/>
-	template string
+	template     string
+	templateData map[string]string
 	// 子组件
 	append []*Slot
 	// 组件拥有的值, 会直接追加到父级data, 所以key最好加前奏, 如果允许多个，那么应该拼接__ID__
@@ -55,6 +57,7 @@ func NewRender(templates ...string) *Render {
 	}
 	return &Render{
 		template:      template,
+		templateData:  make(map[string]string),
 		append:        make([]*Slot, 0),
 		data:          make(map[string]interface{}),
 		methodsRender: make(map[string]string),
@@ -81,30 +84,38 @@ func (r *Render) repID(t string) string {
 
 // Slot 模拟插槽
 type Slot struct {
-	Name string // 插入父级的标签， <name>
+	PreData string // data放到父级key下
+	Name    string // 插入父级的标签， <name>
 	RenderBase
 }
 
+func (r *Render) AddTemplateData(k, v string) {
+	r.templateData[k] = v
+}
+
+// AddRender （要添加的组件，插槽，data前缀)
 func (r *Render) AddRender(render RenderBase, slots ...string) RenderBase {
-	if len(slots) != 0 {
-		for _, slot := range slots {
-			r.append = append(r.append, &Slot{
-				Name:       "<slot id=\"" + slot + "\"/>",
-				RenderBase: render,
-			})
-		}
-	} else {
-		r.append = append(r.append, &Slot{
-			Name:       "",
-			RenderBase: render,
-		})
+	slot := &Slot{
+		RenderBase: render,
 	}
 
-	return render
+	switch len(slots) {
+	case 2:
+		slot.PreData = slots[1]
+		slot.Name = "<slot id=\"" + slots[0] + "\"/>"
+	case 1:
+		slot.Name = "<slot id=\"" + slots[0] + "\"/>"
+	}
+	r.append = append(r.append, slot)
+	return slot
 }
 
 func (r *Render) GetTemplate() string {
 	template := r.template
+	// 处理需要替换的值
+	for s, i := range r.templateData {
+		template = strings.ReplaceAll(template, s, i)
+	}
 	for i, slot := range r.append {
 		if slot.Name == "" {
 			// 没有插槽, 追加到模版未
@@ -129,10 +140,27 @@ func (r *Render) GetData() map[string]interface{} {
 	data := r.data
 	for _, slot := range r.append {
 		for k, v := range slot.GetData() {
-			data[k] = v
+			if slot.PreData != "" {
+				v2, ok := data[slot.PreData]
+				if !ok {
+					v2 = make(map[string]interface{})
+				}
+				PreDataMap, ok2 := v2.(map[string]interface{})
+				if !ok2 {
+					logrus.Error("前缀key类型错误")
+					continue
+				}
+				PreDataMap[k] = v
+				data[slot.PreData] = PreDataMap
+			} else {
+				data[k] = v
+			}
 		}
 	}
-	v, _ := json.Marshal(data)
+	v, err := json.Marshal(data)
+	if err != nil {
+		logrus.Error(err)
+	}
 	s := r.repID(string(v))
 	nData := make(map[string]interface{})
 	_ = json.Unmarshal([]byte(s), &nData)

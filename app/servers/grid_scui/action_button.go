@@ -19,7 +19,7 @@ func NewButton(text string) *Button {
 func (b *Button) Confirm(url string) *ConfirmButton {
 	funName, code := loadJsFunction("button_confirm.js")
 	funName = RenderID + funName
-	b.attr = append(b.attr, "@click=\""+funName+"\"")
+	b.attr = append(b.attr, "@click=\""+funName+"(row)\"")
 
 	// 添加跳转函数, 内容固定, 连贯操作替换固定中文
 	url = strings.ReplaceAll(url, "{{", "\"+")

@@ -1,13 +1,29 @@
 package grid_scui
 
-import "gorm.io/gorm"
+import (
+	"github.com/go-home-admin/home/app/http"
+	"gorm.io/gorm"
+)
 
 type Search struct {
-	Form
+	http.Context
+	*Form
 	where []*SearchWhere
 }
 
-func (s *Search) ToString() map[string]interface{} {
+func NewTableSearch(ctx http.Context) *Search {
+	search := &Search{
+		Context: ctx,
+		Form:    NewForm(),
+	}
+	search.AddMethods("onSubmit", `function(){
+		this.getData()
+	}`)
+
+	return search
+}
+
+func (s *Search) GetData() map[string]interface{} {
 	config := s.Form
 	for _, where := range s.where {
 		config.FormItems = append(config.FormItems, where.ToFormItems())
@@ -36,25 +52,6 @@ func (s *SearchWhere) ToFormItems() FormItems {
 
 func (s *SearchWhere) Where() {
 
-}
-
-type Form struct {
-	LabelWidth    string      `json:"labelWidth"`
-	LabelPosition string      `json:"labelPosition"`
-	Size          string      `json:"size"`
-	FormItems     []FormItems `json:"formItems"`
-}
-
-type FormItems struct {
-	Label          string                 `json:"label,omitempty"`
-	Name           string                 `json:"name,omitempty"`
-	Value          string                 `json:"value,omitempty"`
-	Component      string                 `json:"component,omitempty"`
-	Span           int                    `json:"span"`
-	Options        map[string]interface{} `json:"options,omitempty"`
-	Rules          map[string]string      `json:"rules,omitempty"`
-	RequiredHandle string                 `json:"required_handle,omitempty"`
-	HideHandle     string                 `json:"hide_handle,omitempty"`
 }
 
 // Input 普通组件
