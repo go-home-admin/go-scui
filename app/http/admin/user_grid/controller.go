@@ -19,8 +19,8 @@ func (receiver Controller) NewGridTable(ctx http.Context) *grid_scui.Table {
 	table.Column("注册时间", "datetime").Width("150").Sortable(true)
 	table.Column("进度", "progress").Avatar()
 
-	action := table.RowAction()
-	action.Add()
+	action := table.NewAction()
+	action.AddButton("删除").Confirm("/del?id={{ row.id }}")
 	// 设置搜索栏
 	filter := table.Search()
 	filter.LabelWidth = "120px"

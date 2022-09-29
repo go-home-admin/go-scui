@@ -1,10 +1,29 @@
 package grid_scui
 
 import (
+	"embed"
 	"encoding/json"
+	"github.com/go-home-admin/home/app"
 	uuid "github.com/satori/go.uuid"
+	"io/ioutil"
+	"os"
 	"strings"
 )
+
+const RenderID = "__ID__"
+
+type RenderBase interface {
+	SetID(id string)
+	GetID() string
+	AddRender(render RenderBase, slots ...string) RenderBase
+	GetTemplate() string
+	AddData(k string, v interface{})
+	GetData() map[string]interface{}
+	GetMethods() string
+	MethodsRender() map[string]string
+	GetMounted() string
+	MountedRender() map[string]string
+}
 
 // Render 组件功能, 只能由视图装载
 type Render struct {
@@ -21,6 +40,28 @@ type Render struct {
 	mountedRender map[string]string
 }
 
+func (r *Render) MethodsRender() map[string]string {
+	return r.methodsRender
+}
+
+func (r *Render) MountedRender() map[string]string {
+	return r.mountedRender
+}
+
+func NewRender(templates ...string) *Render {
+	template := ""
+	if len(templates) != 0 {
+		template = templates[0]
+	}
+	return &Render{
+		template:      template,
+		append:        make([]*Slot, 0),
+		data:          make(map[string]interface{}),
+		methodsRender: make(map[string]string),
+		mountedRender: make(map[string]string),
+	}
+}
+
 func (r *Render) SetID(id string) {
 	r.id = id
 }
@@ -35,37 +76,27 @@ func (r *Render) GetID() string {
 }
 
 func (r *Render) repID(t string) string {
-	return strings.ReplaceAll(t, "__ID__", r.id)
+	return strings.ReplaceAll(t, RenderID, r.id)
 }
 
 // Slot 模拟插槽
 type Slot struct {
 	Name string // 插入父级的标签， <name>
-	*Render
+	RenderBase
 }
 
-func (r *Render) forAppend() []*Slot {
-	if r.append == nil {
-		r.append = make([]*Slot, 0)
-	}
-	return r.append
-}
-
-func (r *Render) AddRender(render *Render, slots ...string) *Render {
-	if r.append == nil {
-		r.append = make([]*Slot, 0)
-	}
+func (r *Render) AddRender(render RenderBase, slots ...string) RenderBase {
 	if len(slots) != 0 {
 		for _, slot := range slots {
 			r.append = append(r.append, &Slot{
-				Name:   "<slot #id=\"" + slot + "\"/>",
-				Render: render,
+				Name:       "<slot id=\"" + slot + "\"/>",
+				RenderBase: render,
 			})
 		}
 	} else {
 		r.append = append(r.append, &Slot{
-			Name:   "",
-			Render: render,
+			Name:       "",
+			RenderBase: render,
 		})
 	}
 
@@ -74,10 +105,13 @@ func (r *Render) AddRender(render *Render, slots ...string) *Render {
 
 func (r *Render) GetTemplate() string {
 	template := r.template
-	for _, slot := range r.forAppend() {
+	for i, slot := range r.append {
 		if slot.Name == "" {
 			// 没有插槽, 追加到模版未
 			template = template + slot.GetTemplate()
+		} else if (i + 1) == len(r.append) {
+			// 放入插槽, 最后一个
+			template = strings.ReplaceAll(template, slot.Name, slot.GetTemplate())
 		} else {
 			// 放入插槽, 但是不删除插槽, 防止有多个
 			template = strings.ReplaceAll(template, slot.Name, slot.GetTemplate()+slot.Name)
@@ -87,10 +121,14 @@ func (r *Render) GetTemplate() string {
 	return r.repID(template)
 }
 
+func (r *Render) AddData(k string, v interface{}) {
+	r.data[k] = v
+}
+
 func (r *Render) GetData() map[string]interface{} {
 	data := r.data
-	for _, slot := range r.forAppend() {
-		for k, v := range slot.data {
+	for _, slot := range r.append {
+		for k, v := range slot.GetData() {
 			data[k] = v
 		}
 	}
@@ -101,16 +139,14 @@ func (r *Render) GetData() map[string]interface{} {
 	return nData
 }
 
-func (r *Render) forMethods() map[string]string {
-	if r.methodsRender == nil {
-		r.methodsRender = make(map[string]string)
-	}
-	return r.methodsRender
+func (r *Render) AddMethods(funName string, code string) {
+	r.methodsRender[funName] = code
 }
+
 func (r *Render) GetMethods() string {
-	methodsRender := r.forMethods()
-	for _, slot := range r.forAppend() {
-		for k, v := range slot.forMethods() {
+	methodsRender := r.methodsRender
+	for _, slot := range r.append {
+		for k, v := range slot.MethodsRender() {
 			methodsRender[k] = v
 		}
 	}
@@ -120,16 +156,11 @@ func (r *Render) GetMethods() string {
 	}
 	return "{" + r.repID(str) + "}"
 }
-func (r *Render) forMounted() map[string]string {
-	if r.mountedRender == nil {
-		r.mountedRender = make(map[string]string)
-	}
-	return r.mountedRender
-}
+
 func (r *Render) GetMounted() string {
-	mountedRender := r.forMounted()
-	for _, slot := range r.forAppend() {
-		for k, v := range slot.forMounted() {
+	mountedRender := r.mountedRender
+	for _, slot := range r.append {
+		for k, v := range slot.MountedRender() {
 			mountedRender[k] = v
 		}
 	}
@@ -145,6 +176,8 @@ func (r *Render) GetMounted() string {
 type View struct {
 	Render
 
+	file string
+
 	// 这里是同平常一样的 Vue 组件选项
 	Template string `protobuf:"bytes,1,opt,name=template,proto3" json:"template,omitempty" form:"template"`
 	// 组件数据
@@ -155,6 +188,18 @@ type View struct {
 	Mounted string `protobuf:"bytes,4,opt,name=mounted,proto3" json:"mounted,omitempty" form:"mounted"`
 }
 
+func NewView(view string) *View {
+	v := &View{
+		file: view,
+		Render: Render{
+			data:          map[string]interface{}{},
+			methodsRender: map[string]string{},
+			mountedRender: make(map[string]string),
+		},
+	}
+	return v
+}
+
 // Rendering 返回符合defineAsyncComponent要求
 func (v *View) Rendering() View {
 	return View{
@@ -163,4 +208,45 @@ func (v *View) Rendering() View {
 		Methods:  v.GetMethods(),
 		Mounted:  v.GetMounted(),
 	}
+}
+
+func (v *View) GetTemplate() string {
+	view := loadView(v.file)
+	v.Render.template = view
+
+	return v.Render.GetTemplate()
+}
+
+//go:embed views
+var views embed.FS
+
+func loadView(file string) string {
+	vTable := ""
+	if app.IsDebug() {
+		if _, err := os.Stat("app/servers/grid_scui/views/" + file); err == nil {
+			v, _ := ioutil.ReadFile("app/servers/grid_scui/views/" + file)
+			vTable = string(v)
+		}
+	} else {
+		fileContext, _ := views.ReadFile("views/" + file)
+		vTable = string(fileContext)
+	}
+
+	return vTable
+}
+
+// name, code
+func loadJsFunction(file string) (string, string) {
+	s := loadView(file)
+	index := strings.Index(s, "(")
+
+	name := strings.TrimSpace(s[8:index])
+	return name, "function (" + s[index+1:]
+}
+
+func ToUrl(uri string) string {
+	if strings.Index(uri, "http") != 0 {
+		uri = app.Config("app.url", "http://127.0.0.1:8080") + uri
+	}
+	return uri
 }

@@ -2,7 +2,6 @@ package grid_scui
 
 import (
 	_ "embed"
-	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/go-home-admin/go-admin/generate/proto/common/grid"
 	"github.com/go-home-admin/home/app"
@@ -10,12 +9,11 @@ import (
 	"github.com/go-home-admin/home/protobuf"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
-	"io/ioutil"
-	"os"
 	"strconv"
 )
 
 type Table struct {
+	*View
 	http.Context
 
 	db *gorm.DB
@@ -27,24 +25,17 @@ type Table struct {
 	action *RowAction
 	// [函数名称]代码
 	MethodsRender map[string]func(*Table) string
-	MountedRender map[string]func(*Table) string
 }
 
 func NewTable(ctx http.Context, db *gorm.DB) *Table {
+	view := NewView("table.vue")
+	view.AddMethods("getData", "async function(params){\n\t\treturn await this.$HTTP.get(this.url, params);\n\t}")
 	return &Table{
+		View:    view,
 		Context: ctx,
 		db:      db,
 		columns: make([]*grid.Column, 0),
 		uri:     "",
-		MethodsRender: map[string]func(*Table) string{
-			"get": func(*Table) string {
-				return "async function(params){\n\t\treturn await this.http.get(this.url, params);\n\t}"
-			},
-			"post": func(*Table) string {
-				return "async function(params){\n\t\treturn await this.http.post(this.url, params);\n\t}"
-			},
-		},
-		MountedRender: nil,
 	}
 }
 
@@ -61,13 +52,14 @@ func GetInt(ctx *gin.Context, k string, def int) int {
 	return i
 }
 
+// Paginate 列表数据，分页获取
 func (g *Table) Paginate() ([]*protobuf.Any, int64) {
 	var total int64
 	list := make([]map[string]interface{}, 0)
 	g.db.Count(&total)
 	if total > 0 {
 		Page := GetInt(g.Gin(), "page", 1)
-		PageSize := GetInt(g.Gin(), "page", 20)
+		PageSize := GetInt(g.Gin(), "pageSize", 20)
 		offset := (Page - 1) * PageSize
 		tx := g.db.Offset(int(offset)).Limit(PageSize).Find(&list)
 		if tx.Error != nil {
@@ -76,8 +68,7 @@ func (g *Table) Paginate() ([]*protobuf.Any, int64) {
 	}
 	got := make([]*protobuf.Any, 0)
 	for _, m := range list {
-		s := protobuf.NewAny(m)
-		got = append(got, s)
+		got = append(got, protobuf.NewAny(m))
 	}
 	return got, total
 }
@@ -91,14 +82,19 @@ func (g *Table) ToResponse() *grid.IndexResponse {
 	}
 }
 
-func (g *Table) RowAction() *RowAction {
-	g.action = &RowAction{}
-	return g.action
+func (g *Table) NewAction() *RowAction {
+	action := &RowAction{Context: g.Context, t: g}
+	return action
 }
 
 // Search 返回搜索栏
 func (g *Table) Search() *Search {
-	g.filter = &Search{}
+	g.filter = &Search{
+		Form: Form{
+			LabelWidth:    "130px",
+			LabelPosition: "right",
+		},
+	}
 	return g.filter
 }
 
@@ -109,7 +105,7 @@ func (g *Table) Column(label string, prop string) *Column {
 			Prop:    prop,
 			Filters: make([]*grid.Filter, 0),
 		},
-		Render: &Render{},
+		Render: NewRender(),
 	}
 	g.columns = append(g.columns, c.Column)
 	return &c
@@ -125,66 +121,23 @@ func (g *Table) GetColumn() []*grid.Column {
 	return g.columns
 }
 
-//go:embed views/table.vue
-var vTable string
-
-func (g *Table) GetTemplate() string {
-	if app.IsDebug() {
-		if _, err := os.Stat("app/servers/grid_scui/views/table.vue"); err == nil {
-			v, _ := ioutil.ReadFile("app/servers/grid_scui/views/table.vue")
-			vTable = string(v)
-		}
-	}
-
-	return vTable
-}
-
-// AddMethods js函数定义
-func (g *Table) AddMethods(name string, fun func(*Table) string) {
-	if _, ok := g.MethodsRender[name]; !ok {
-		g.MethodsRender[name] = fun
-	}
-}
-
-// AddMethodsCode js函数定义
-func (g *Table) AddMethodsCode(name string, code string) {
-	if _, ok := g.MethodsRender[name]; !ok {
-		g.MethodsRender[name] = func(table *Table) string {
-			return code
-		}
-	}
-}
-
-// GetMethods 获取所有js函数定义
-func (g *Table) GetMethods() string {
-	str := "{\n"
-	for s, f := range g.MethodsRender {
-		str = str + "\n" + s + ":" + f(g) + ",\n"
-	}
-	return str + "\n}"
-}
-
-func (g *Table) GetMounted() string {
-	return ""
-}
-
 func (g *Table) SetUri(v string) {
 	g.uri = app.Config("app.url", "http:127.0.0.1:8080") + v
 }
 
-func (g *Table) GetData() string {
-	data := map[string]interface{}{
-		"columns": g.GetColumn(),
-		"url":     g.uri,
+func (g *Table) GetUri() string {
+	if g.uri == "" {
+		g.uri = app.Config("app.url", "http:127.0.0.1:8080") + g.Context.Gin().Request.URL.Path + "/list"
 	}
+	return g.uri
+}
 
+func (g *Table) GetData() map[string]interface{} {
 	if g.filter != nil {
-		data["filter"] = g.filter.ToString()
+		g.View.AddData("filter", g.filter.ToString())
 	}
+	g.View.AddData("columns", g.GetColumn())
+	g.View.AddData("url", g.GetUri())
 
-	str, err := json.Marshal(data)
-	if err != nil {
-		logrus.Error(err)
-	}
-	return string(str)
+	return g.View.GetData()
 }
