@@ -16,8 +16,8 @@ func NewTableSearch(ctx http.Context) *Search {
 		Context: ctx,
 		Form:    NewForm(),
 	}
-	search.AddMethods("onSubmit", `function(){
-		this.getData()
+	search.AddMethods("onSubmit", `async function(){
+		this.$refs.table.upData()
 	}`)
 
 	return search
@@ -48,10 +48,6 @@ type SearchWhere struct {
 
 func (s *SearchWhere) ToFormItems() FormItems {
 	return s.FormItems
-}
-
-func (s *SearchWhere) Where() {
-
 }
 
 // Input 普通组件
