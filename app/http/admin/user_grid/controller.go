@@ -15,12 +15,13 @@ func (receiver Controller) NewGridTable(ctx http.Context) *grid_scui.Table {
 	table := grid_scui.NewTable(ctx, mysql.NewOrmUser().GetDB())
 	table.Column("姓名", "nickname").Width("150")
 	table.Column("性别", "sex").Width("150").Filters([]*grid.Filter{{Text: "男", Value: "1"}, {Text: "女", Value: "0"}})
-	table.Column("邮箱", "email").Width("250")
-	table.Column("注册时间", "created_at").Width("150").Sortable(true)
+	table.Column("邮箱", "email").Width("150")
+	table.Column("注册时间", "created_at").Width("250").Sortable(true)
 	table.Column("进度", "progress").Avatar()
 
 	action := table.NewAction()
 	action.AddButton("删除").Confirm("/del?id={{ row.id }}")
+	action.AddButton("编辑").Dialog(receiver.Form())
 
 	// 设置搜索栏
 	filter := table.NewSearch()
@@ -32,8 +33,6 @@ func (receiver Controller) NewGridTable(ctx http.Context) *grid_scui.Table {
 	return table
 }
 
-func (receiver Controller) Form() *grid_scui.Form {
-	form := grid_scui.NewForm()
-
-	return form
+func (receiver Controller) Form() grid_scui.RenderBase {
+	return grid_scui.NewRender("test")
 }

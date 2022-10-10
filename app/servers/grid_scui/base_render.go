@@ -17,7 +17,8 @@ type RenderBase interface {
 	SetID(id string)
 	GetID() string
 	AddRender(render RenderBase, slots ...string) RenderBase
-	GetTemplate() string
+	AppendTemplate(s string)
+	GetTemplate(pr ...RenderBase) string
 	AddData(k string, v interface{})
 	GetData() map[string]interface{}
 	GetMethods() string
@@ -31,8 +32,9 @@ type Render struct {
 	id string
 	// template 里面的内容如果存在#__ID__, 那么会替换成成组件id
 	// 如果需要插槽, 可以使用<name/>
-	template     string
-	templateData map[string]string
+	template       string
+	templateAppend string
+	templateData   map[string]string
 	// 子组件
 	append []*Slot
 	// 组件拥有的值, 会直接追加到父级data, 所以key最好加前奏, 如果允许多个，那么应该拼接__ID__
@@ -40,6 +42,10 @@ type Render struct {
 	// [函数名称]代码
 	methodsRender map[string]string
 	mountedRender map[string]string
+}
+
+func (r *Render) AppendTemplate(s string) {
+	r.templateAppend = r.templateAppend + s
 }
 
 func (r *Render) MethodsRender() map[string]string {
@@ -110,7 +116,7 @@ func (r *Render) AddRender(render RenderBase, slots ...string) RenderBase {
 	return slot
 }
 
-func (r *Render) GetTemplate() string {
+func (r *Render) GetTemplate(pr ...RenderBase) string {
 	template := r.template
 	// 处理需要替换的值
 	for s, i := range r.templateData {
@@ -119,17 +125,24 @@ func (r *Render) GetTemplate() string {
 	for i, slot := range r.append {
 		if slot.Name == "" {
 			// 没有插槽, 追加到模版未
-			template = template + slot.GetTemplate()
+			if len(pr) == 0 {
+				template = template + slot.GetTemplate(r)
+			} else {
+				// 添加到上级
+				for _, base := range pr {
+					base.AppendTemplate(slot.GetTemplate(r))
+				}
+			}
 		} else if (i + 1) == len(r.append) {
 			// 放入插槽, 最后一个
-			template = strings.ReplaceAll(template, slot.Name, slot.GetTemplate())
+			template = strings.ReplaceAll(template, slot.Name, slot.GetTemplate(r))
 		} else {
 			// 放入插槽, 但是不删除插槽, 防止有多个
-			template = strings.ReplaceAll(template, slot.Name, slot.GetTemplate()+slot.Name)
+			template = strings.ReplaceAll(template, slot.Name, slot.GetTemplate(r)+slot.Name)
 		}
 	}
 
-	return r.repID(template)
+	return r.repID(template + r.templateAppend)
 }
 
 func (r *Render) AddData(k string, v interface{}) {
@@ -238,11 +251,11 @@ func (v *View) Rendering() View {
 	}
 }
 
-func (v *View) GetTemplate() string {
+func (v *View) GetTemplate(pr ...RenderBase) string {
 	view := loadView(v.file)
 	v.Render.template = view
 
-	return v.Render.GetTemplate()
+	return v.Render.GetTemplate(pr...)
 }
 
 //go:embed views

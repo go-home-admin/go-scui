@@ -31,15 +31,40 @@ func (b *Button) Confirm(url string) *ConfirmButton {
 	}
 }
 
-func (b *Button) GetTemplate() string {
+func (b *Button) Dialog(render RenderBase) *Dialog {
+	dialog := &Dialog{
+		Button: b,
+	}
+
+	b.attr = append(b.attr, `@click="__ID__DialogOpen"`)
+	dialog.AddData("__ID__visible", false)
+	dialog.AddMethods(`__ID__DialogOpen`, `
+function () {
+	this.__ID__visible = true
+}
+`)
+	// 按钮操作的关联组件
+	dia := NewRender(`<el-dialog v-model="` + b.id + `visible" :width="500""><slot id="form"/></el-dialog>`)
+	dia.AddRender(render.(RenderBase), "form")
+	b.AddRender(dia)
+	return dialog
+}
+
+// Dialog 弹窗
+type Dialog struct {
+	*Button
+}
+
+func (b *Button) GetTemplate(pr ...RenderBase) string {
 	btnStr := ""
 	for _, s := range b.attr {
 		btnStr = btnStr + " " + s
 	}
 	b.Render.template = strings.ReplaceAll(b.Render.template, "__BUTTON__", btnStr)
-	return b.repID(b.Render.GetTemplate())
+	return b.repID(b.Render.GetTemplate(pr...))
 }
 
+// ConfirmButton 确认按钮
 type ConfirmButton struct {
 	*Button
 	funName string
