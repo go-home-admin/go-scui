@@ -43,6 +43,7 @@ func NewForm() *DialogForm {
 			View:          view,
 			LabelWidth:    "130px",
 			LabelPosition: "right",
+			FormItems:     make([]*FormItems, 0),
 		},
 		formData: map[string]interface{}{},
 	}
@@ -50,9 +51,9 @@ func NewForm() *DialogForm {
 
 func (f *DialogForm) GetData() map[string]interface{} {
 	data := map[string]interface{}{
-		"formItems": f.FormItems,
-		"form":      f.formData,
-		"loading":   false,
+		"config":  f.Form,
+		"form":    f.formData,
+		"loading": false,
 	}
 
 	return map[string]interface{}{
