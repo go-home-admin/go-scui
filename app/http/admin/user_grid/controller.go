@@ -8,8 +8,7 @@ import (
 )
 
 // Controller @Bean
-type Controller struct {
-}
+type Controller struct{}
 
 func (receiver Controller) NewGridTable(ctx http.Context) *grid_scui.Table {
 	table := grid_scui.NewTable(ctx, mysql.NewOrmUser().GetDB())
@@ -34,5 +33,7 @@ func (receiver Controller) NewGridTable(ctx http.Context) *grid_scui.Table {
 }
 
 func (receiver Controller) Form() grid_scui.RenderBase {
-	return grid_scui.NewRender("test")
+	form := grid_scui.NewForm()
+	form.Input("name", "名称")
+	return form
 }

@@ -14,7 +14,7 @@ type Search struct {
 func NewTableSearch(ctx http.Context) *Search {
 	search := &Search{
 		Context: ctx,
-		Form:    NewForm(),
+		Form:    NewTableForm(),
 	}
 	search.AddMethods("onSubmit", `async function(){
 		this.$refs.table.upData()
@@ -39,14 +39,14 @@ func (s *Search) GetData() map[string]interface{} {
 }
 
 type SearchWhere struct {
-	FormItems
+	*FormItems
 	// 对应的数据库字段
 	Field string
 
 	ormWhere func(db *gorm.DB)
 }
 
-func (s *SearchWhere) ToFormItems() FormItems {
+func (s *SearchWhere) ToFormItems() *FormItems {
 	return s.FormItems
 }
 
@@ -54,7 +54,7 @@ func (s *SearchWhere) ToFormItems() FormItems {
 func (s *Search) Input(prop, label string) *FilterInput {
 	w := &SearchWhere{
 		Field: prop,
-		FormItems: FormItems{
+		FormItems: &FormItems{
 			Label:     label,
 			Name:      prop,
 			Component: "input",

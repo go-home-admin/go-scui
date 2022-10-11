@@ -78,7 +78,7 @@ message Column {
 	// 状态翻译
 	repeated Filter filters = 6;
 	// Vue 模板
-	string Template = 10;
+	string template = 10;
 }
 
 message Filter {

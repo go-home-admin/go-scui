@@ -4,11 +4,12 @@ import (
 	"embed"
 	"encoding/json"
 	"github.com/go-home-admin/home/app"
-	uuid "github.com/satori/go.uuid"
 	"github.com/sirupsen/logrus"
 	"io/ioutil"
+	"math/rand"
 	"os"
 	"strings"
+	"time"
 )
 
 const RenderID = "__ID__"
@@ -62,6 +63,7 @@ func NewRender(templates ...string) *Render {
 		template = templates[0]
 	}
 	return &Render{
+		id:            Krand(10, KC_RAND_KIND_UPPER),
 		template:      template,
 		templateData:  make(map[string]string),
 		append:        make([]*Slot, 0),
@@ -75,17 +77,35 @@ func (r *Render) SetID(id string) {
 	r.id = id
 }
 
+const (
+	KC_RAND_KIND_NUM   = 0 // 纯数字
+	KC_RAND_KIND_LOWER = 1 // 小写字母
+	KC_RAND_KIND_UPPER = 2 // 大写字母
+	KC_RAND_KIND_ALL   = 3 // 数字、大小写字母
+)
+
+// 随机字符串
+func Krand(size int, kind int) string {
+	ikind, kinds, result := kind, [][]int{[]int{10, 48}, []int{26, 97}, []int{26, 65}}, make([]byte, size)
+	is_all := kind > 2 || kind < 0
+	rand.Seed(time.Now().UnixNano())
+	for i := 0; i < size; i++ {
+		if is_all { // random ikind
+			ikind = rand.Intn(3)
+		}
+		scope, base := kinds[ikind][0], kinds[ikind][1]
+		result[i] = uint8(base + rand.Intn(scope))
+	}
+	return string(result)
+}
+
 // GetID 例如同时渲染多个表格，是需要一个key区分
 func (r *Render) GetID() string {
-	if r.id == "" {
-		r.id = uuid.NewV4().String()
-	}
-
 	return r.id
 }
 
 func (r *Render) repID(t string) string {
-	return strings.ReplaceAll(t, RenderID, r.id)
+	return strings.ReplaceAll(t, RenderID, r.GetID())
 }
 
 // Slot 模拟插槽
@@ -130,7 +150,7 @@ func (r *Render) GetTemplate(pr ...RenderBase) string {
 			} else {
 				// 添加到上级
 				for _, base := range pr {
-					base.AppendTemplate(slot.GetTemplate(r))
+					base.AppendTemplate(r.repID(slot.GetTemplate(r)))
 				}
 			}
 		} else if (i + 1) == len(r.append) {
@@ -181,7 +201,7 @@ func (r *Render) GetData() map[string]interface{} {
 }
 
 func (r *Render) AddMethods(funName string, code string) {
-	r.methodsRender[funName] = code
+	r.methodsRender[r.repID(funName)] = r.repID(code)
 }
 
 func (r *Render) GetMethods() string {
@@ -215,7 +235,7 @@ func (r *Render) GetMounted() string {
 // View 视图
 // 只能由前端defineAsyncComponent动态加载
 type View struct {
-	Render
+	*Render
 
 	file string
 
@@ -231,12 +251,8 @@ type View struct {
 
 func NewView(view string) *View {
 	v := &View{
-		file: view,
-		Render: Render{
-			data:          map[string]interface{}{},
-			methodsRender: map[string]string{},
-			mountedRender: make(map[string]string),
-		},
+		file:   view,
+		Render: NewRender(""),
 	}
 	return v
 }
