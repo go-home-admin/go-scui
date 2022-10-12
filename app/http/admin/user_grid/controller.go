@@ -35,7 +35,7 @@ func (g *GuiContext) NewGridTable() *t.Table {
 	filter := table.NewSearch()
 	filter.Input("name", "名称").Placeholder("这里是提示语").Span(12)
 	filter.Input("nick", "昵称").Span(12)
-	filter.Input("nick2", "xvsasf").Span(6)
+	filter.Input("sex", "性别").Span(6)
 
 	return table
 }

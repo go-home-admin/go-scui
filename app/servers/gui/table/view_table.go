@@ -2,6 +2,7 @@ package table
 
 import (
 	_ "embed"
+	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/go-home-admin/go-admin/app/servers/gui/base"
 	"github.com/go-home-admin/go-admin/generate/proto/common/grid"
@@ -10,7 +11,9 @@ import (
 	"github.com/go-home-admin/home/protobuf"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
+	"io/ioutil"
 	"strconv"
+	"strings"
 )
 
 type Table struct {
@@ -72,12 +75,42 @@ func (g *Table) Paginate() ([]*protobuf.Any, int64) {
 }
 
 func (g *Table) ToResponse() *grid.IndexResponse {
+	if app.IsDebug() {
+		toVueFile(g)
+	}
+
 	return &grid.IndexResponse{
 		Template: g.GetTemplate(),
 		Data:     protobuf.NewAny(g.GetData()),
 		Methods:  g.GetMethods(),
 		Mounted:  g.GetMounted(),
 	}
+}
+
+func toVueFile(g *Table) {
+	// 在本地生成一个调试模版
+	vueStr := `
+<template>__template__</template>
+<script>
+export default {
+  data() {
+    return __data__
+  },
+  mounted() {
+    __mounted__
+  },
+  methods: __methods__
+}
+</script>
+`
+	d, _ := json.Marshal(g.GetData())
+	vueStr = base.ReplaceAll(vueStr, []string{
+		"__template__", g.GetTemplate(),
+		"__data__", string(d),
+		"__mounted__", g.GetMounted(),
+		"__methods__", g.GetMethods(),
+	})
+	_ = ioutil.WriteFile("resources/gui/"+strings.ReplaceAll(g.GetUri(), "/", "")+".vue", []byte(vueStr), 0755)
 }
 
 // NewAction 列操作

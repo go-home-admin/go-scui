@@ -1,13 +1,10 @@
 package base
 
 import (
-	"embed"
 	"encoding/json"
 	"github.com/go-home-admin/home/app"
 	"github.com/sirupsen/logrus"
-	"io/ioutil"
 	"math/rand"
-	"os"
 	"strings"
 	"time"
 )
@@ -217,6 +214,10 @@ func (r *Render) AddMethods(funName string, code string) {
 	r.MethodsRender[r.RepID(funName)] = r.RepID(code)
 }
 
+func (r *Render) AddMounted(k, code string) {
+	r.MountedRender[k] = r.RepID(code)
+}
+
 func (r *Render) GetMethods() string {
 	methodsRender := r.MethodsRender
 	for _, slot := range r.append {
@@ -240,7 +241,7 @@ func (r *Render) GetMounted() string {
 	}
 	str := ""
 	for _, funStr := range mountedRender {
-		str = str + "\n" + funStr + ",\n"
+		str = str + "\n" + funStr + "\n"
 	}
 	return r.RepID(str)
 }
@@ -265,7 +266,7 @@ type View struct {
 func NewView(view string) *View {
 	v := &View{
 		file:   view,
-		Render: NewRender(""),
+		Render: LoadVue(view),
 	}
 	return v
 }
@@ -281,28 +282,7 @@ func (v *View) Rendering() View {
 }
 
 func (v *View) GetTemplate(pr ...RenderBase) string {
-	view := LoadView(v.file)
-	v.Render.Template = view
-
 	return v.Render.GetTemplate(pr...)
-}
-
-//go:embed views
-var views embed.FS
-
-func LoadView(file string) string {
-	vTable := ""
-	if app.IsDebug() {
-		if _, err := os.Stat("app/servers/gui/base/views/" + file); err == nil {
-			v, _ := ioutil.ReadFile("app/servers/gui/base/views/" + file)
-			vTable = string(v)
-		}
-	} else {
-		fileContext, _ := views.ReadFile("base/views/" + file)
-		vTable = string(fileContext)
-	}
-
-	return vTable
 }
 
 // LoadJsFunction name, code

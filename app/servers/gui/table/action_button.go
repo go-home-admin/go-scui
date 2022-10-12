@@ -52,7 +52,7 @@ func (b *Button) Edit(render *form.DialogForm) *Dialog {
 	}
 	`, "__FORM_ID__", render.GetID()))
 	// 按钮操作的关联组件
-	dia := base.NewRender(`<el-dialog v-model="` + b.GetID() + `visible" :width="500""><slot id="form"/></el-dialog>`)
+	dia := base.NewRender(`<el-dialog v-model="` + b.GetID() + `visible" :width="500"><slot id="form"/></el-dialog>`)
 	dia.AddRender(render, "form")
 	b.AddRender(dia)
 
@@ -71,7 +71,7 @@ func (b *Button) Dialog(render base.RenderBase) *Dialog {
 }
 `)
 	// 按钮操作的关联组件
-	dia := base.NewRender(`<el-dialog v-model="` + b.GetID() + `visible" :width="500""><slot id="form"/></el-dialog>`)
+	dia := base.NewRender(`<el-dialog v-model="` + b.GetID() + `visible" :width="500"><slot id="form"/></el-dialog>`)
 	dia.AddRender(render.(base.RenderBase), "form")
 	b.AddRender(dia)
 	return dialog
