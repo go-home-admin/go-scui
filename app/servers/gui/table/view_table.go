@@ -122,9 +122,15 @@ func (g *Table) NewAction() *RowAction {
 
 // NewSearch 返回搜索栏
 func (g *Table) NewSearch() *Search {
-	form := NewTableSearch(g.Context)
+	form := NewTableSearch(g)
 	g.View.AddRender(form, "search", "filter")
 	return form
+}
+
+func (g *Table) NewHeader() *Header {
+	r := NewHeader(g)
+	g.View.AddRender(r, "header")
+	return r
 }
 
 func (g *Table) Column(label string, prop string) *Column {

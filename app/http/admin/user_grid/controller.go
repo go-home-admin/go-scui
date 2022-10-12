@@ -37,6 +37,9 @@ func (g *GuiContext) NewGridTable() *t.Table {
 	filter.Input("nick", "昵称").Span(12)
 	filter.Input("sex", "性别").Span(6)
 
+	header := table.NewHeader()
+	header.Create(g.Form())
+
 	return table
 }
 
