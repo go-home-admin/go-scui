@@ -1,4 +1,4 @@
-package grid_scui
+package gui
 
 import (
 	"embed"
@@ -50,10 +50,23 @@ func (r *Render) AppendTemplate(s string) {
 }
 
 func (r *Render) MethodsRender() map[string]string {
-	return r.methodsRender
+	methodsRender := r.methodsRender
+	for _, slot := range r.append {
+		for k, v := range slot.MethodsRender() {
+			methodsRender[k] = v
+		}
+	}
+
+	return methodsRender
 }
 
 func (r *Render) MountedRender() map[string]string {
+	mountedRender := r.mountedRender
+	for _, slot := range r.append {
+		for k, v := range slot.MountedRender() {
+			mountedRender[k] = v
+		}
+	}
 	return r.mountedRender
 }
 
@@ -280,8 +293,8 @@ var views embed.FS
 func loadView(file string) string {
 	vTable := ""
 	if app.IsDebug() {
-		if _, err := os.Stat("app/servers/grid_scui/views/" + file); err == nil {
-			v, _ := ioutil.ReadFile("app/servers/grid_scui/views/" + file)
+		if _, err := os.Stat("app/servers/gui/views/" + file); err == nil {
+			v, _ := ioutil.ReadFile("app/servers/gui/views/" + file)
 			vTable = string(v)
 		}
 	} else {
@@ -306,4 +319,12 @@ func ToUrl(uri string) string {
 		uri = app.Config("app.url", "http://127.0.0.1:8080") + uri
 	}
 	return uri
+}
+
+func ReplaceAll(s string, r []string) string {
+	for i := 0; i < len(r); i++ {
+		s = strings.ReplaceAll(s, r[i], r[i+1])
+		i++
+	}
+	return s
 }

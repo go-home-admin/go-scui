@@ -1,4 +1,4 @@
-package grid_scui
+package gui
 
 import (
 	"github.com/go-home-admin/home/app/http"

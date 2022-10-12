@@ -1,17 +1,22 @@
-package grid_scui
+package gui
 
-import "strings"
+import (
+	"github.com/go-home-admin/home/app/http"
+	"strings"
+)
 
 type Button struct {
+	http.Context
 	*Render
 
 	attr []string
 }
 
-func NewButton(text string) *Button {
+func NewButton(ctx http.Context, text string) *Button {
 	return &Button{
-		Render: NewRender(`<el-button __BUTTON__>` + text + `</el-button>`),
-		attr:   make([]string, 0),
+		Context: ctx,
+		Render:  NewRender(`<el-button __BUTTON__>` + text + `</el-button>`),
+		attr:    make([]string, 0),
 	}
 }
 
@@ -31,15 +36,35 @@ func (b *Button) Confirm(url string) *ConfirmButton {
 	}
 }
 
+func (b *Button) Edit(render *DialogForm) *Dialog {
+	render.OnSubmit(`function() {
+		console.log(this.__ID__.form)
+		alert("待请求")
+	}`)
+	dialog := &Dialog{Button: b}
+	b.attr = append(b.attr, `@click="__ID__DialogOpen(row)"`)
+	dialog.AddData("__ID__visible", false)
+	dialog.AddMethods(`__ID__DialogOpen`, strings.ReplaceAll(`function (row) {
+		this.__ID__visible = true
+		this.__FORM_ID__SetData(row)
+	}
+	`, "__FORM_ID__", render.GetID()))
+	// 按钮操作的关联组件
+	dia := NewRender(`<el-dialog v-model="` + b.id + `visible" :width="500""><slot id="form"/></el-dialog>`)
+	dia.AddRender(render, "form")
+	b.AddRender(dia)
+
+	return dialog
+}
+
 func (b *Button) Dialog(render RenderBase) *Dialog {
 	dialog := &Dialog{
 		Button: b,
 	}
 
-	b.attr = append(b.attr, `@click="__ID__DialogOpen"`)
+	b.attr = append(b.attr, `@click="__ID__DialogOpen(row)"`)
 	dialog.AddData("__ID__visible", false)
-	dialog.AddMethods(`__ID__DialogOpen`, `
-function () {
+	dialog.AddMethods(`__ID__DialogOpen`, `function (row) {
 	this.__ID__visible = true
 }
 `)

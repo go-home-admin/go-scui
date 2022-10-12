@@ -1,4 +1,4 @@
-package grid_scui
+package gui
 
 type FilterInput struct {
 	*SearchWhere

@@ -1,4 +1,4 @@
-package grid_scui
+package gui
 
 type Form struct {
 	*View
@@ -7,6 +7,22 @@ type Form struct {
 	LabelPosition string       `json:"labelPosition"`
 	Size          string       `json:"size"`
 	FormItems     []*FormItems `json:"formItems"`
+
+	rules    map[string]interface{}
+	formData map[string]interface{}
+}
+
+func (f *Form) AddItems(base RenderBase) {
+	f.AddRender(base, "form-item")
+}
+
+func (f *Form) AddFormData(k string, v interface{}) {
+	f.formData[k] = v
+}
+
+// OnSubmit 提交函数
+func (f *Form) OnSubmit(v string) {
+	f.AddMethods("__ID__onSubmit", v)
 }
 
 type FormItems struct {
@@ -25,34 +41,42 @@ type FormItems struct {
 	HideHandle     string                 `json:"hide_handle,omitempty"`
 }
 
+func (i *FormItems) GetOpt() string {
+	s := ""
+	for s2, i2 := range i.Options {
+		switch i2.(type) {
+		case string:
+			s = s + " " + s2 + `="` + i2.(string) + `"`
+		}
+	}
+
+	return s
+}
+
 type DialogForm struct {
 	*Form
-
-	formData map[string]interface{}
 }
 
 func NewForm() *DialogForm {
 	view := NewView("form.vue")
-
-	view.AddMethods("__ID__onSubmit", `async function(){
-		alert("你点击了提交")
+	view.AddMethods("__ID__SetData", `function(form) {
+		this.__ID__.form = form
 	}`)
-
 	return &DialogForm{
 		Form: &Form{
 			View:          view,
-			LabelWidth:    "130px",
 			LabelPosition: "right",
 			FormItems:     make([]*FormItems, 0),
+			rules:         map[string]interface{}{},
+			formData:      map[string]interface{}{},
 		},
-		formData: map[string]interface{}{},
 	}
 }
 
 func (f *DialogForm) GetData() map[string]interface{} {
 	data := map[string]interface{}{
-		"config":  f.Form,
-		"form":    f.formData,
+		"form":    f.Form.formData,
+		"rules":   false,
 		"loading": false,
 	}
 
@@ -61,32 +85,10 @@ func (f *DialogForm) GetData() map[string]interface{} {
 	}
 }
 
-// Input 普通组件
-func (f *Form) Input(prop, label string) *InputFormItems {
-	item := &InputFormItems{
-		FormItems: &FormItems{
-			Label:     label,
-			Name:      prop,
-			Component: "input",
-			Options: map[string]interface{}{
-				"placeholder": prop,
-			},
-		},
-	}
-	f.FormItems = append(f.FormItems, item.FormItems)
-
-	return item
-}
-
-type InputFormItems struct {
-	*FormItems
-}
-
 func NewTableForm() *Form {
 	view := NewView("table_form.vue")
 	return &Form{
 		View:          view,
-		LabelWidth:    "130px",
 		LabelPosition: "right",
 	}
 }

@@ -8,7 +8,7 @@ import (
 
 // Index   列表页面
 func (receiver *Controller) Index(req *grid.IndexRequest, ctx http.Context) (*grid.IndexResponse, error) {
-	table := receiver.NewGridTable(ctx)
+	table := NewGuiContext(ctx).NewGridTable()
 	return table.ToResponse(), nil
 }
 

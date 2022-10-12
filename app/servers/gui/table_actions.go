@@ -1,4 +1,4 @@
-package grid_scui
+package gui
 
 import "github.com/go-home-admin/home/app/http"
 
@@ -9,13 +9,13 @@ type RowAction struct {
 }
 
 func (r *RowAction) AddButton(text string) *Button {
-	btn := NewButton(text)
+	btn := NewButton(r.Context, text)
 	r.t.AddRender(btn, "actions")
 	return btn
 }
 
 func (r *RowAction) CreateAction() *Button {
-	btn := NewButton("创建")
+	btn := NewButton(nil, "创建")
 	btn.template = `<el-button type="primary" plain size="small" @click="table_edit(row)">编辑</el-button>`
 	btn.AddMethods("table_edit", `
 function(row){
