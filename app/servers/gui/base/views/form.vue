@@ -1,5 +1,5 @@
 <template>
-  <el-form :model="__ID__.form" :rules="__ID__.rules" ref="__ID__Ref" :loading="__ID__.loading">
+  <el-form :model="__ID__.form" :rules="__ID__.rules" ref="__ID__Ref">
     <slot id="form-item"/>
   </el-form>
 

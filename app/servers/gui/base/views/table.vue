@@ -38,9 +38,6 @@ export default {
       "filterShow": false
     }
   },
-  mounted() {
-    alert("test")
-  },
   methods: {
     //点击筛选按钮
     onFilter: function () {

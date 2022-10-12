@@ -30,7 +30,7 @@ type Render struct {
 	id string
 	// Template 里面的内容如果存在#__ID__, 那么会替换成成组件id
 	// 如果需要插槽, 可以使用<name/>
-	Template       string
+	Template       string `json:"-"`
 	templateAppend string
 	templateData   map[string]string
 	// 子组件
@@ -38,8 +38,8 @@ type Render struct {
 	// 组件拥有的值, 会直接追加到父级data, 所以key最好加前奏, 如果允许多个，那么应该拼接__ID__
 	data map[string]interface{}
 	// [函数名称]代码
-	MethodsRender map[string]string
-	MountedRender map[string]string
+	MethodsRender map[string]string `json:"-"`
+	MountedRender map[string]string `json:"-"`
 }
 
 func (r *Render) AppendTemplate(s string) {

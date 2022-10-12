@@ -110,7 +110,10 @@ export default {
 		"__mounted__", g.GetMounted(),
 		"__methods__", g.GetMethods(),
 	})
-	_ = ioutil.WriteFile("resources/gui/"+strings.ReplaceAll(g.GetUri(), "/", "")+".vue", []byte(vueStr), 0755)
+	err := ioutil.WriteFile("resources/gui/"+strings.ReplaceAll(g.GetUri(), "/", "")+".vue", []byte(vueStr), 0755)
+	if err != nil {
+		logrus.Error(err)
+	}
 }
 
 // NewAction 列操作
