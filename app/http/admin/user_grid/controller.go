@@ -3,7 +3,7 @@ package user_grid
 import (
 	"github.com/go-home-admin/go-admin/app/entity/mysql"
 	"github.com/go-home-admin/go-admin/app/servers/gui/form"
-	"github.com/go-home-admin/go-admin/app/servers/gui/table"
+	t "github.com/go-home-admin/go-admin/app/servers/gui/table"
 	"github.com/go-home-admin/go-admin/generate/proto/common/grid"
 	"github.com/go-home-admin/home/app/http"
 )
@@ -19,8 +19,8 @@ func NewGuiContext(ctx http.Context) *GuiContext {
 	return &GuiContext{ctx}
 }
 
-func (g *GuiContext) NewGridTable() *table.Table {
-	table := table.NewTable(g.Context, mysql.NewOrmUser().GetDB())
+func (g *GuiContext) NewGridTable() *t.Table {
+	table := t.NewTable(g.Context, mysql.NewOrmUser().GetDB())
 	table.Column("姓名", "nickname").Width("150")
 	table.Column("性别", "sex").Width("150").Filters([]*grid.Filter{{Text: "男", Value: "1"}, {Text: "女", Value: "0"}})
 	table.Column("邮箱", "email").Width("150")
