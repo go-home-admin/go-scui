@@ -1,13 +1,15 @@
 package gui
 
 import (
+	"github.com/go-home-admin/go-admin/app/servers/gui/base"
+	"github.com/go-home-admin/go-admin/app/servers/gui/form"
 	"github.com/go-home-admin/home/app/http"
 	"strings"
 )
 
 type Button struct {
 	http.Context
-	*Render
+	*base.Render
 
 	attr []string
 }
@@ -15,28 +17,28 @@ type Button struct {
 func NewButton(ctx http.Context, text string) *Button {
 	return &Button{
 		Context: ctx,
-		Render:  NewRender(`<el-button __BUTTON__>` + text + `</el-button>`),
+		Render:  base.NewRender(`<el-button __BUTTON__>` + text + `</el-button>`),
 		attr:    make([]string, 0),
 	}
 }
 
 // Confirm 确认后请求, url 中的 {{ row.id }} 会作为代码执行
 func (b *Button) Confirm(url string) *ConfirmButton {
-	funName, code := loadJsFunction("button_confirm.js")
-	funName = RenderID + funName
+	funName, code := base.LoadJsFunction("button_confirm.js")
+	funName = base.RenderID + funName
 	b.attr = append(b.attr, "@click=\""+funName+"(row)\"")
 
 	// 添加跳转函数, 内容固定, 连贯操作替换固定中文
 	url = strings.ReplaceAll(url, "{{", "\"+")
 	url = strings.ReplaceAll(url, "}}", "+\"")
-	code = strings.ReplaceAll(code, "__url__", "\""+ToUrl(url)+"\"")
+	code = strings.ReplaceAll(code, "__url__", "\""+base.ToUrl(url)+"\"")
 	b.AddMethods(funName, code)
 	return &ConfirmButton{
 		Button: b, funName: funName,
 	}
 }
 
-func (b *Button) Edit(render *DialogForm) *Dialog {
+func (b *Button) Edit(render *form.DialogForm) *Dialog {
 	render.OnSubmit(`function() {
 		console.log(this.__ID__.form)
 		alert("待请求")
@@ -50,14 +52,14 @@ func (b *Button) Edit(render *DialogForm) *Dialog {
 	}
 	`, "__FORM_ID__", render.GetID()))
 	// 按钮操作的关联组件
-	dia := NewRender(`<el-dialog v-model="` + b.id + `visible" :width="500""><slot id="form"/></el-dialog>`)
+	dia := base.NewRender(`<el-dialog v-model="` + b.GetID() + `visible" :width="500""><slot id="form"/></el-dialog>`)
 	dia.AddRender(render, "form")
 	b.AddRender(dia)
 
 	return dialog
 }
 
-func (b *Button) Dialog(render RenderBase) *Dialog {
+func (b *Button) Dialog(render base.RenderBase) *Dialog {
 	dialog := &Dialog{
 		Button: b,
 	}
@@ -69,8 +71,8 @@ func (b *Button) Dialog(render RenderBase) *Dialog {
 }
 `)
 	// 按钮操作的关联组件
-	dia := NewRender(`<el-dialog v-model="` + b.id + `visible" :width="500""><slot id="form"/></el-dialog>`)
-	dia.AddRender(render.(RenderBase), "form")
+	dia := base.NewRender(`<el-dialog v-model="` + b.GetID() + `visible" :width="500""><slot id="form"/></el-dialog>`)
+	dia.AddRender(render.(base.RenderBase), "form")
 	b.AddRender(dia)
 	return dialog
 }
@@ -80,13 +82,13 @@ type Dialog struct {
 	*Button
 }
 
-func (b *Button) GetTemplate(pr ...RenderBase) string {
+func (b *Button) GetTemplate(pr ...base.RenderBase) string {
 	btnStr := ""
 	for _, s := range b.attr {
 		btnStr = btnStr + " " + s
 	}
-	b.Render.template = strings.ReplaceAll(b.Render.template, "__BUTTON__", btnStr)
-	return b.repID(b.Render.GetTemplate(pr...))
+	b.Render.Template = strings.ReplaceAll(b.Render.Template, "__BUTTON__", btnStr)
+	return b.RepID(b.Render.GetTemplate(pr...))
 }
 
 // ConfirmButton 确认按钮
@@ -96,11 +98,11 @@ type ConfirmButton struct {
 }
 
 func (b *ConfirmButton) Title(title string) *ConfirmButton {
-	b.Button.mountedRender[b.funName] = strings.ReplaceAll(b.Button.mountedRender[b.funName], "敏感操作提示", title)
+	b.Button.MountedRender[b.funName] = strings.ReplaceAll(b.Button.MountedRender[b.funName], "敏感操作提示", title)
 	return b
 }
 
 func (b *ConfirmButton) Text(text string) *ConfirmButton {
-	b.Button.mountedRender[b.funName] = strings.ReplaceAll(b.Button.mountedRender[b.funName], "这是一个敏感的操作，是否继续?", text)
+	b.Button.MountedRender[b.funName] = strings.ReplaceAll(b.Button.MountedRender[b.funName], "这是一个敏感的操作，是否继续?", text)
 	return b
 }

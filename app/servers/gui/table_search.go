@@ -1,20 +1,21 @@
 package gui
 
 import (
+	"github.com/go-home-admin/go-admin/app/servers/gui/form"
 	"github.com/go-home-admin/home/app/http"
 	"gorm.io/gorm"
 )
 
 type Search struct {
 	http.Context
-	*Form
+	*form.Form
 	where []*SearchWhere
 }
 
 func NewTableSearch(ctx http.Context) *Search {
 	search := &Search{
 		Context: ctx,
-		Form:    NewTableForm(),
+		Form:    form.NewTableForm(),
 	}
 	search.AddMethods("onSubmit", `async function(){
 		this.$refs.table.upData()
@@ -39,14 +40,14 @@ func (s *Search) GetData() map[string]interface{} {
 }
 
 type SearchWhere struct {
-	*FormItems
+	*form.FormItems
 	// 对应的数据库字段
 	Field string
 
 	ormWhere func(db *gorm.DB)
 }
 
-func (s *SearchWhere) ToFormItems() *FormItems {
+func (s *SearchWhere) ToFormItems() *form.FormItems {
 	return s.FormItems
 }
 
@@ -54,7 +55,7 @@ func (s *SearchWhere) ToFormItems() *FormItems {
 func (s *Search) Input(prop, label string) *FilterInput {
 	w := &SearchWhere{
 		Field: prop,
-		FormItems: &FormItems{
+		FormItems: &form.FormItems{
 			Label:     label,
 			Name:      prop,
 			Component: "input",

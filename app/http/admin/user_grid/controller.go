@@ -3,6 +3,7 @@ package user_grid
 import (
 	"github.com/go-home-admin/go-admin/app/entity/mysql"
 	"github.com/go-home-admin/go-admin/app/servers/gui"
+	"github.com/go-home-admin/go-admin/app/servers/gui/form"
 	"github.com/go-home-admin/go-admin/generate/proto/common/grid"
 	"github.com/go-home-admin/home/app/http"
 )
@@ -39,8 +40,8 @@ func (g *GuiContext) NewGridTable() *gui.Table {
 	return table
 }
 
-func (g *GuiContext) Form() *gui.DialogForm {
-	form := gui.NewForm()
-	form.Input("nickname", "名称")
-	return form
+func (g *GuiContext) Form() *form.DialogForm {
+	f := form.NewForm()
+	f.Input("nickname", "名称")
+	return f
 }

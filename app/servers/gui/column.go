@@ -1,10 +1,13 @@
 package gui
 
-import "github.com/go-home-admin/go-admin/generate/proto/common/grid"
+import (
+	"github.com/go-home-admin/go-admin/app/servers/gui/base"
+	"github.com/go-home-admin/go-admin/generate/proto/common/grid"
+)
 
 type Column struct {
 	*grid.Column
-	*Render
+	*base.Render
 }
 
 func (c *Column) Width(v string) *Column {

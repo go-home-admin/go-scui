@@ -3,6 +3,7 @@ package gui
 import (
 	_ "embed"
 	"github.com/gin-gonic/gin"
+	"github.com/go-home-admin/go-admin/app/servers/gui/base"
 	"github.com/go-home-admin/go-admin/generate/proto/common/grid"
 	"github.com/go-home-admin/home/app"
 	"github.com/go-home-admin/home/app/http"
@@ -13,7 +14,7 @@ import (
 )
 
 type Table struct {
-	*View
+	*base.View
 	http.Context
 
 	db *gorm.DB
@@ -25,7 +26,7 @@ type Table struct {
 }
 
 func NewTable(ctx http.Context, db *gorm.DB) *Table {
-	view := NewView("table.vue")
+	view := base.NewView("table.vue")
 	view.AddMethods("getData", "async function(params){\n\t\treturn await this.$HTTP.get(this.url, params);\n\t}")
 	return &Table{
 		View:    view,
@@ -99,7 +100,7 @@ func (g *Table) Column(label string, prop string) *Column {
 			Prop:    prop,
 			Filters: make([]*grid.Filter, 0),
 		},
-		Render: NewRender(),
+		Render: base.NewRender(),
 	}
 	g.columns = append(g.columns, c.Column)
 	return &c

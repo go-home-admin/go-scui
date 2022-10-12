@@ -9,9 +9,9 @@ func (c *Column) Avatar(opt ...string) *Column {
 		opts = opts + " " + s
 	}
 	template := strings.ReplaceAll(`
-<template #{k}="scope">
+<Template #{k}="scope">
   <el-avatar {opts} />
-</template>
+</Template>
 `, "{k}", c.Column.Prop)
 	template = strings.ReplaceAll(template, "{opts}", opts)
 	return c.Template(template)

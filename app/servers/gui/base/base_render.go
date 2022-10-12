@@ -1,4 +1,4 @@
-package gui
+package base
 
 import (
 	"embed"
@@ -23,17 +23,17 @@ type RenderBase interface {
 	AddData(k string, v interface{})
 	GetData() map[string]interface{}
 	GetMethods() string
-	MethodsRender() map[string]string
+	GetMethodsRender() map[string]string
 	GetMounted() string
-	MountedRender() map[string]string
+	GetMountedRender() map[string]string
 }
 
 // Render 组件功能, 只能由视图装载
 type Render struct {
 	id string
-	// template 里面的内容如果存在#__ID__, 那么会替换成成组件id
+	// Template 里面的内容如果存在#__ID__, 那么会替换成成组件id
 	// 如果需要插槽, 可以使用<name/>
-	template       string
+	Template       string
 	templateAppend string
 	templateData   map[string]string
 	// 子组件
@@ -41,18 +41,18 @@ type Render struct {
 	// 组件拥有的值, 会直接追加到父级data, 所以key最好加前奏, 如果允许多个，那么应该拼接__ID__
 	data map[string]interface{}
 	// [函数名称]代码
-	methodsRender map[string]string
-	mountedRender map[string]string
+	MethodsRender map[string]string
+	MountedRender map[string]string
 }
 
 func (r *Render) AppendTemplate(s string) {
 	r.templateAppend = r.templateAppend + s
 }
 
-func (r *Render) MethodsRender() map[string]string {
-	methodsRender := r.methodsRender
+func (r *Render) GetMethodsRender() map[string]string {
+	methodsRender := r.MethodsRender
 	for _, slot := range r.append {
-		for k, v := range slot.MethodsRender() {
+		for k, v := range slot.GetMethodsRender() {
 			methodsRender[k] = v
 		}
 	}
@@ -60,14 +60,14 @@ func (r *Render) MethodsRender() map[string]string {
 	return methodsRender
 }
 
-func (r *Render) MountedRender() map[string]string {
-	mountedRender := r.mountedRender
+func (r *Render) GetMountedRender() map[string]string {
+	mountedRender := r.MountedRender
 	for _, slot := range r.append {
-		for k, v := range slot.MountedRender() {
+		for k, v := range slot.GetMountedRender() {
 			mountedRender[k] = v
 		}
 	}
-	return r.mountedRender
+	return r.MountedRender
 }
 
 func NewRender(templates ...string) *Render {
@@ -77,12 +77,12 @@ func NewRender(templates ...string) *Render {
 	}
 	return &Render{
 		id:            Krand(10, KC_RAND_KIND_UPPER),
-		template:      template,
+		Template:      template,
 		templateData:  make(map[string]string),
 		append:        make([]*Slot, 0),
 		data:          make(map[string]interface{}),
-		methodsRender: make(map[string]string),
-		mountedRender: make(map[string]string),
+		MethodsRender: make(map[string]string),
+		MountedRender: make(map[string]string),
 	}
 }
 
@@ -117,7 +117,7 @@ func (r *Render) GetID() string {
 	return r.id
 }
 
-func (r *Render) repID(t string) string {
+func (r *Render) RepID(t string) string {
 	return strings.ReplaceAll(t, RenderID, r.GetID())
 }
 
@@ -150,7 +150,7 @@ func (r *Render) AddRender(render RenderBase, slots ...string) RenderBase {
 }
 
 func (r *Render) GetTemplate(pr ...RenderBase) string {
-	template := r.template
+	template := r.Template
 	// 处理需要替换的值
 	for s, i := range r.templateData {
 		template = strings.ReplaceAll(template, s, i)
@@ -163,7 +163,7 @@ func (r *Render) GetTemplate(pr ...RenderBase) string {
 			} else {
 				// 添加到上级
 				for _, base := range pr {
-					base.AppendTemplate(r.repID(slot.GetTemplate(r)))
+					base.AppendTemplate(r.RepID(slot.GetTemplate(r)))
 				}
 			}
 		} else if (i + 1) == len(r.append) {
@@ -175,7 +175,7 @@ func (r *Render) GetTemplate(pr ...RenderBase) string {
 		}
 	}
 
-	return r.repID(template + r.templateAppend)
+	return r.RepID(template + r.templateAppend)
 }
 
 func (r *Render) AddData(k string, v interface{}) {
@@ -207,20 +207,20 @@ func (r *Render) GetData() map[string]interface{} {
 	if err != nil {
 		logrus.Error(err)
 	}
-	s := r.repID(string(v))
+	s := r.RepID(string(v))
 	nData := make(map[string]interface{})
 	_ = json.Unmarshal([]byte(s), &nData)
 	return nData
 }
 
 func (r *Render) AddMethods(funName string, code string) {
-	r.methodsRender[r.repID(funName)] = r.repID(code)
+	r.MethodsRender[r.RepID(funName)] = r.RepID(code)
 }
 
 func (r *Render) GetMethods() string {
-	methodsRender := r.methodsRender
+	methodsRender := r.MethodsRender
 	for _, slot := range r.append {
-		for k, v := range slot.MethodsRender() {
+		for k, v := range slot.GetMethodsRender() {
 			methodsRender[k] = v
 		}
 	}
@@ -228,13 +228,13 @@ func (r *Render) GetMethods() string {
 	for funName, funStr := range methodsRender {
 		str = str + "\n" + funName + ":" + funStr + ",\n"
 	}
-	return "{" + r.repID(str) + "}"
+	return "{" + r.RepID(str) + "}"
 }
 
 func (r *Render) GetMounted() string {
-	mountedRender := r.mountedRender
+	mountedRender := r.MountedRender
 	for _, slot := range r.append {
-		for k, v := range slot.MountedRender() {
+		for k, v := range slot.GetMountedRender() {
 			mountedRender[k] = v
 		}
 	}
@@ -242,7 +242,7 @@ func (r *Render) GetMounted() string {
 	for _, funStr := range mountedRender {
 		str = str + "\n" + funStr + ",\n"
 	}
-	return r.repID(str)
+	return r.RepID(str)
 }
 
 // View 视图
@@ -253,7 +253,7 @@ type View struct {
 	file string
 
 	// 这里是同平常一样的 Vue 组件选项
-	Template string `protobuf:"bytes,1,opt,name=template,proto3" json:"template,omitempty" form:"template"`
+	Template string `protobuf:"bytes,1,opt,name=Template,proto3" json:"Template,omitempty" form:"Template"`
 	// 组件数据
 	Data interface{} `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty" form:"data"`
 	// js 函数 {}
@@ -281,8 +281,8 @@ func (v *View) Rendering() View {
 }
 
 func (v *View) GetTemplate(pr ...RenderBase) string {
-	view := loadView(v.file)
-	v.Render.template = view
+	view := LoadView(v.file)
+	v.Render.Template = view
 
 	return v.Render.GetTemplate(pr...)
 }
@@ -290,24 +290,24 @@ func (v *View) GetTemplate(pr ...RenderBase) string {
 //go:embed views
 var views embed.FS
 
-func loadView(file string) string {
+func LoadView(file string) string {
 	vTable := ""
 	if app.IsDebug() {
-		if _, err := os.Stat("app/servers/gui/views/" + file); err == nil {
-			v, _ := ioutil.ReadFile("app/servers/gui/views/" + file)
+		if _, err := os.Stat("app/servers/gui/base/views/" + file); err == nil {
+			v, _ := ioutil.ReadFile("app/servers/gui/base/views/" + file)
 			vTable = string(v)
 		}
 	} else {
-		fileContext, _ := views.ReadFile("views/" + file)
+		fileContext, _ := views.ReadFile("base/views/" + file)
 		vTable = string(fileContext)
 	}
 
 	return vTable
 }
 
-// name, code
-func loadJsFunction(file string) (string, string) {
-	s := loadView(file)
+// LoadJsFunction name, code
+func LoadJsFunction(file string) (string, string) {
+	s := LoadView(file)
 	index := strings.Index(s, "(")
 
 	name := strings.TrimSpace(s[8:index])

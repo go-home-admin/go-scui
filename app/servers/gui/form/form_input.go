@@ -1,4 +1,8 @@
-package gui
+package form
+
+import (
+	"github.com/go-home-admin/go-admin/app/servers/gui/base"
+)
 
 const input = `
 <el-form-item label="__label__" prop="__prop__">
@@ -10,7 +14,7 @@ const input = `
 func (f *Form) Input(prop, label string) *InputFormItems {
 	item := &InputFormItems{
 		formID: f.GetID(),
-		Render: NewRender(input),
+		Render: base.NewRender(input),
 		FormItems: &FormItems{
 			Label:     label,
 			Name:      prop,
@@ -27,16 +31,16 @@ func (f *Form) Input(prop, label string) *InputFormItems {
 
 type InputFormItems struct {
 	formID string
-	*Render
+	*base.Render
 	*FormItems
 }
 
-func (i *InputFormItems) GetTemplate(pr ...RenderBase) string {
-	i.template = ReplaceAll(i.template, []string{
+func (i *InputFormItems) GetTemplate(pr ...base.RenderBase) string {
+	i.Template = base.ReplaceAll(i.Template, []string{
 		"__FORM__", i.formID + ".form",
 		"__label__", i.FormItems.Label,
 		"__prop__", i.FormItems.Name,
 		"__options__", i.FormItems.GetOpt(),
 	})
-	return i.template
+	return i.Template
 }

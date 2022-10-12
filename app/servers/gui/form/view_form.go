@@ -1,7 +1,11 @@
-package gui
+package form
+
+import (
+	"github.com/go-home-admin/go-admin/app/servers/gui/base"
+)
 
 type Form struct {
-	*View
+	*base.View
 
 	LabelWidth    string       `json:"labelWidth"`
 	LabelPosition string       `json:"labelPosition"`
@@ -12,7 +16,7 @@ type Form struct {
 	formData map[string]interface{}
 }
 
-func (f *Form) AddItems(base RenderBase) {
+func (f *Form) AddItems(base base.RenderBase) {
 	f.AddRender(base, "form-item")
 }
 
@@ -58,7 +62,7 @@ type DialogForm struct {
 }
 
 func NewForm() *DialogForm {
-	view := NewView("form.vue")
+	view := base.NewView("form.vue")
 	view.AddMethods("__ID__SetData", `function(form) {
 		this.__ID__.form = form
 	}`)
@@ -86,7 +90,7 @@ func (f *DialogForm) GetData() map[string]interface{} {
 }
 
 func NewTableForm() *Form {
-	view := NewView("table_form.vue")
+	view := base.NewView("table_form.vue")
 	return &Form{
 		View:          view,
 		LabelPosition: "right",

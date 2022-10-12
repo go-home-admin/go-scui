@@ -5,7 +5,7 @@ import "strings"
 // Image el-image
 func (c *Column) Image() *Column {
 	return c.Template(strings.ReplaceAll(`
-<template #{k}="scope">
+<Template #{k}="scope">
   <div class="demo-image__preview">
     <el-image
       style="width: 100px; height: 100px"
@@ -15,6 +15,6 @@ func (c *Column) Image() *Column {
       fit="cover"
     />
   </div>
-</template>
+</Template>
 `, "{k}", c.Column.Prop))
 }
