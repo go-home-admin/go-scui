@@ -26,8 +26,10 @@ func NewTableSearch(ctx http.Context) *Search {
 
 func (s *Search) GetData() map[string]interface{} {
 	config := s.Form
-	for _, where := range s.where {
-		config.FormItems = append(config.FormItems, where.ToFormItems())
+	if len(config.FormItems) == 0 {
+		for _, where := range s.where {
+			config.FormItems = append(config.FormItems, where.ToFormItems())
+		}
 	}
 
 	data := map[string]interface{}{

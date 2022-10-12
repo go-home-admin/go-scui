@@ -3,6 +3,7 @@ package table
 import (
 	"github.com/go-home-admin/go-admin/app/servers/gui/base"
 	"github.com/go-home-admin/go-admin/app/servers/gui/form"
+	"github.com/go-home-admin/go-admin/app/servers/gui/html"
 	"github.com/go-home-admin/home/app/http"
 	"strings"
 )
@@ -29,8 +30,10 @@ func (b *Button) Confirm(url string) *ConfirmButton {
 	b.attr = append(b.attr, "@click=\""+funName+"(row)\"")
 
 	// 添加跳转函数, 内容固定, 连贯操作替换固定中文
-	url = strings.ReplaceAll(url, "{{", "\"+")
-	url = strings.ReplaceAll(url, "}}", "+\"")
+	url = base.ReplaceAll(url, []string{
+		"{{", "\"+",
+		"}}", "+\"",
+	})
 	code = strings.ReplaceAll(code, "__url__", "\""+base.ToUrl(url)+"\"")
 	b.AddMethods(funName, code)
 	return &ConfirmButton{
@@ -38,29 +41,30 @@ func (b *Button) Confirm(url string) *ConfirmButton {
 	}
 }
 
-func (b *Button) Edit(render *form.DialogForm) *Dialog {
-	render.OnSubmit(`function() {
+func (b *Button) Edit(formRender *form.DialogForm) *DialogButton {
+	formRender.OnSubmit(`function() {
 		console.log(this.__ID__.form)
 		alert("待请求")
 	}`)
-	dialog := &Dialog{Button: b}
-	b.attr = append(b.attr, `@click="__ID__DialogOpen(row)"`)
-	dialog.AddData("__ID__visible", false)
-	dialog.AddMethods(`__ID__DialogOpen`, strings.ReplaceAll(`function (row) {
-		this.__ID__visible = true
-		this.__FORM_ID__SetData(row)
-	}
-	`, "__FORM_ID__", render.GetID()))
-	// 按钮操作的关联组件
-	dia := base.NewRender(`<el-dialog v-model="` + b.GetID() + `visible" :width="500"><slot id="form"/></el-dialog>`)
-	dia.AddRender(render, "form")
+	dia := html.NewDialog().SetContext(formRender)
 	b.AddRender(dia)
 
-	return dialog
+	dialogButton := &DialogButton{Button: b}
+	b.attr = append(b.attr, `@click="__ID__DialogOpen(row)"`)
+	dialogButton.AddMethods(`__ID__DialogOpen`, base.ReplaceAll(`function (row) {
+		this.__DIALOG__ = true
+		this.__FORM_ID__SetData(row)
+	}
+	`, []string{
+		"__DIALOG__", dia.GetVisibleName(),
+		"__FORM_ID__", formRender.GetID(),
+	}))
+
+	return dialogButton
 }
 
-func (b *Button) Dialog(render base.RenderBase) *Dialog {
-	dialog := &Dialog{
+func (b *Button) Dialog(render base.RenderBase) *DialogButton {
+	dialog := &DialogButton{
 		Button: b,
 	}
 
@@ -71,14 +75,14 @@ func (b *Button) Dialog(render base.RenderBase) *Dialog {
 }
 `)
 	// 按钮操作的关联组件
-	dia := base.NewRender(`<el-dialog v-model="` + b.GetID() + `visible" :width="500"><slot id="form"/></el-dialog>`)
-	dia.AddRender(render.(base.RenderBase), "form")
+	dia := html.NewDialog()
+	dia.AddRender(render.(base.RenderBase), "context")
 	b.AddRender(dia)
 	return dialog
 }
 
-// Dialog 弹窗
-type Dialog struct {
+// DialogButton 弹窗
+type DialogButton struct {
 	*Button
 }
 

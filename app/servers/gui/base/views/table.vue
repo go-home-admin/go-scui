@@ -47,6 +47,9 @@ export default {
         this.filterShow = true
       }
     },
+    getData: async function (params) {
+      return await this.$HTTP.get(this.url, params);
+    },
   }
 }
 </script>

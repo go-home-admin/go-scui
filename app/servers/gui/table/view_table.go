@@ -29,10 +29,8 @@ type Table struct {
 }
 
 func NewTable(ctx http.Context, db *gorm.DB) *Table {
-	view := base.NewView("table.vue")
-	view.AddMethods("getData", "async function(params){\n\t\treturn await this.$HTTP.get(this.url, params);\n\t}")
 	return &Table{
-		View:    view,
+		View:    base.NewView("table.vue"),
 		Context: ctx,
 		db:      db,
 		columns: make([]*grid.Column, 0),
@@ -76,7 +74,7 @@ func (g *Table) Paginate() ([]*protobuf.Any, int64) {
 
 func (g *Table) ToResponse() *grid.IndexResponse {
 	if app.IsDebug() {
-		toVueFile(g)
+		defer toVueFile(*g)
 	}
 
 	return &grid.IndexResponse{
@@ -87,7 +85,7 @@ func (g *Table) ToResponse() *grid.IndexResponse {
 	}
 }
 
-func toVueFile(g *Table) {
+func toVueFile(g Table) {
 	// 在本地生成一个调试模版
 	vueStr := `
 <template>__template__</template>

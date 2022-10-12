@@ -40,6 +40,8 @@ type Render struct {
 	// [函数名称]代码
 	MethodsRender map[string]string `json:"-"`
 	MountedRender map[string]string `json:"-"`
+
+	toTemplate bool
 }
 
 func (r *Render) AppendTemplate(s string) {
@@ -157,7 +159,8 @@ func (r *Render) GetTemplate(pr ...RenderBase) string {
 			// 没有插槽, 追加到模版未
 			if len(pr) == 0 {
 				template = template + slot.GetTemplate(r)
-			} else {
+			} else if !r.toTemplate {
+				r.toTemplate = true
 				// 添加到上级
 				for _, base := range pr {
 					base.AppendTemplate(r.RepID(slot.GetTemplate(r)))
