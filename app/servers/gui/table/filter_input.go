@@ -1,4 +1,4 @@
-package gui
+package table
 
 type FilterInput struct {
 	*SearchWhere

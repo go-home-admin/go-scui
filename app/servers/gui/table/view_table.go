@@ -1,4 +1,4 @@
-package gui
+package table
 
 import (
 	_ "embed"

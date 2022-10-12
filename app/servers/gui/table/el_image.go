@@ -1,6 +1,8 @@
-package gui
+package table
 
-import "strings"
+import (
+	"strings"
+)
 
 // Image el-image
 func (c *Column) Image() *Column {

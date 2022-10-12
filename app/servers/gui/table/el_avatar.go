@@ -1,6 +1,8 @@
-package gui
+package table
 
-import "strings"
+import (
+	"strings"
+)
 
 // Avatar el-avatar
 func (c *Column) Avatar(opt ...string) *Column {

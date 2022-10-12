@@ -1,4 +1,4 @@
-package gui
+package table
 
 import (
 	"github.com/go-home-admin/go-admin/app/servers/gui/base"

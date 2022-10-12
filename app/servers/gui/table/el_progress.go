@@ -1,6 +1,8 @@
-package gui
+package table
 
-import "strings"
+import (
+	"strings"
+)
 
 // 进度条
 func (c *Column) progress() *Column {
