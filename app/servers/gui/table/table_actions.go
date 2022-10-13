@@ -2,11 +2,10 @@ package table
 
 import (
 	"github.com/go-home-admin/go-admin/app/servers/gui/base"
-	"github.com/go-home-admin/home/app/http"
 )
 
 type RowAction struct {
-	http.Context
+	Context GuiContext
 
 	t *Table
 }

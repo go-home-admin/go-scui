@@ -2,17 +2,15 @@ package table
 
 import (
 	"github.com/go-home-admin/go-admin/app/servers/gui/base"
-	"github.com/go-home-admin/go-admin/app/servers/gui/form"
 	"github.com/go-home-admin/go-admin/app/servers/gui/html"
-	"github.com/go-home-admin/home/app/http"
 )
 
 type Header struct {
-	http.Context
+	Context GuiContext
 	*base.Render
 }
 
-func NewHeader(ctx http.Context) *Header {
+func NewHeader(ctx GuiContext) *Header {
 	return &Header{
 		Context: ctx,
 		Render:  base.NewRender(`<slot id="header"/>`),
@@ -23,7 +21,8 @@ func (h *Header) add(r base.RenderBase) {
 	h.AddRender(r, "header")
 }
 
-func (h *Header) Create(formRender *form.DialogForm) *DialogButton {
+func (h *Header) Create() *DialogButton {
+	formRender := GetForm(h.Context)
 	formRender.OnSubmit(`function() {
 		console.log(this.__ID__.form)
 		alert("待请求")
@@ -31,7 +30,7 @@ func (h *Header) Create(formRender *form.DialogForm) *DialogButton {
 	dia := html.NewDialog().SetContext(formRender)
 	h.AddRender(dia)
 
-	button := NewButton(h, "创建")
+	button := NewButton(h.Context, "创建")
 	h.add(button)
 	dialogButton := &DialogButton{Button: button}
 	button.attr = append(button.attr, `@click="__ID__DialogOpen({})"`)

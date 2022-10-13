@@ -16,11 +16,11 @@ type GuiContext struct {
 }
 
 func NewGuiContext(ctx http.Context) *GuiContext {
-	return &GuiContext{ctx}
+	return &GuiContext{Context: ctx}
 }
 
 func (g *GuiContext) NewGridTable() *t.Table {
-	table := t.NewTable(g.Context, mysql.NewOrmUser().GetDB())
+	table := t.NewTable(g, mysql.NewOrmUser().GetDB())
 	table.Column("姓名", "nickname").Width("150")
 	table.Column("性别", "sex").Width("150").Filters([]*grid.Filter{{Text: "男", Value: "1"}, {Text: "女", Value: "0"}})
 	table.Column("邮箱", "email").Width("150")
@@ -29,7 +29,7 @@ func (g *GuiContext) NewGridTable() *t.Table {
 
 	action := table.NewAction()
 	action.AddButton("删除").Confirm("/del?id={{ row.id }}")
-	action.AddButton("编辑").Edit(g.Form())
+	action.AddButton("编辑").Edit()
 
 	// 设置搜索栏
 	filter := table.NewSearch()
@@ -38,13 +38,12 @@ func (g *GuiContext) NewGridTable() *t.Table {
 	filter.Input("sex", "性别").Span(6)
 
 	header := table.NewHeader()
-	header.Create(g.Form())
+	header.Create()
 
 	return table
 }
 
-func (g *GuiContext) Form() *form.DialogForm {
-	f := form.NewForm()
+func (g *GuiContext) Form(f *form.DialogForm) {
 	f.Input("nickname", "名称")
-	return f
+
 }

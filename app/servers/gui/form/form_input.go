@@ -15,7 +15,7 @@ func (f *Form) Input(prop, label string) *InputFormItems {
 	item := &InputFormItems{
 		formID: f.GetID(),
 		Render: base.NewRender(input),
-		FormItems: &FormItems{
+		formItems: &FormItems{
 			Label:     label,
 			Name:      prop,
 			Component: "input",
@@ -32,15 +32,15 @@ func (f *Form) Input(prop, label string) *InputFormItems {
 type InputFormItems struct {
 	formID string
 	*base.Render
-	*FormItems
+	formItems *FormItems
 }
 
 func (i *InputFormItems) GetTemplate(pr ...base.RenderBase) string {
 	i.Template = base.ReplaceAll(i.Template, []string{
 		"__FORM__", i.formID + ".form",
-		"__label__", i.FormItems.Label,
-		"__prop__", i.FormItems.Name,
-		"__options__", i.FormItems.GetOpt(),
+		"__label__", i.formItems.Label,
+		"__prop__", i.formItems.Name,
+		"__options__", i.formItems.GetOpt(),
 	})
 	return i.Template
 }

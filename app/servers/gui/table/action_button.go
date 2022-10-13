@@ -2,20 +2,18 @@ package table
 
 import (
 	"github.com/go-home-admin/go-admin/app/servers/gui/base"
-	"github.com/go-home-admin/go-admin/app/servers/gui/form"
 	"github.com/go-home-admin/go-admin/app/servers/gui/html"
-	"github.com/go-home-admin/home/app/http"
 	"strings"
 )
 
 type Button struct {
-	http.Context
+	Context GuiContext
 	*base.Render
 
 	attr []string
 }
 
-func NewButton(ctx http.Context, text string) *Button {
+func NewButton(ctx GuiContext, text string) *Button {
 	return &Button{
 		Context: ctx,
 		Render:  base.NewRender(`<el-button __BUTTON__>` + text + `</el-button>`),
@@ -41,7 +39,8 @@ func (b *Button) Confirm(url string) *ConfirmButton {
 	}
 }
 
-func (b *Button) Edit(formRender *form.DialogForm) *DialogButton {
+func (b *Button) Edit() *DialogButton {
+	formRender := GetForm(b.Context)
 	formRender.OnSubmit(`function() {
 		console.log(this.__ID__.form)
 		alert("待请求")

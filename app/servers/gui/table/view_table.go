@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/go-home-admin/go-admin/app/servers/gui/base"
+	"github.com/go-home-admin/go-admin/app/servers/gui/form"
 	"github.com/go-home-admin/go-admin/generate/proto/common/grid"
 	"github.com/go-home-admin/home/app"
 	"github.com/go-home-admin/home/app/http"
@@ -18,9 +19,8 @@ import (
 
 type Table struct {
 	*base.View
-	http.Context
-
-	db *gorm.DB
+	Context GuiContext
+	db      *gorm.DB
 	// 存储列表信息
 	columns []*grid.Column
 	uri     string
@@ -28,14 +28,38 @@ type Table struct {
 	action *RowAction
 }
 
-func NewTable(ctx http.Context, db *gorm.DB) *Table {
-	return &Table{
+type GuiContext interface {
+	http.Context
+	Form(f *form.DialogForm)
+}
+
+func GetForm(g GuiContext) *form.DialogForm {
+	var f *form.DialogForm
+	i, ok := g.Gin().Get("__gui_form__")
+	if !ok {
+		f = form.NewForm()
+		g.Form(f)
+		g.Gin().Set("__gui_form__", f)
+	} else {
+		f = i.(*form.DialogForm)
+	}
+	return f
+}
+
+func NewTable(ctx GuiContext, db *gorm.DB) *Table {
+	t := &Table{
 		View:    base.NewView("table.vue"),
 		Context: ctx,
 		db:      db,
 		columns: make([]*grid.Column, 0),
 		uri:     "",
 	}
+	iniTable(t)
+	return t
+}
+
+func iniTable(t *Table) {
+
 }
 
 func GetInt(ctx *gin.Context, k string, def int) int {
@@ -57,8 +81,8 @@ func (g *Table) Paginate() ([]*protobuf.Any, int64) {
 	list := make([]map[string]interface{}, 0)
 	g.db.Count(&total)
 	if total > 0 {
-		Page := GetInt(g.Gin(), "page", 1)
-		PageSize := GetInt(g.Gin(), "pageSize", 20)
+		Page := GetInt(g.Context.Gin(), "page", 1)
+		PageSize := GetInt(g.Context.Gin(), "pageSize", 20)
 		offset := (Page - 1) * PageSize
 		tx := g.db.Offset(int(offset)).Limit(PageSize).Find(&list)
 		if tx.Error != nil {
@@ -122,13 +146,13 @@ func (g *Table) NewAction() *RowAction {
 
 // NewSearch 返回搜索栏
 func (g *Table) NewSearch() *Search {
-	form := NewTableSearch(g)
-	g.View.AddRender(form, "search", "filter")
-	return form
+	f := NewTableSearch(g.Context)
+	g.View.AddRender(f, "search", "filter")
+	return f
 }
 
 func (g *Table) NewHeader() *Header {
-	r := NewHeader(g)
+	r := NewHeader(g.Context)
 	g.View.AddRender(r, "header")
 	return r
 }
