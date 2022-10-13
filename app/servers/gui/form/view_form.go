@@ -62,13 +62,9 @@ type DialogForm struct {
 }
 
 func NewForm() *DialogForm {
-	view := base.NewView("form.vue")
-	view.AddMethods("__ID__SetData", `function(form) {
-		this.__ID__.form = form
-	}`)
 	return &DialogForm{
 		Form: &Form{
-			View:          view,
+			View:          base.NewView("form.vue"),
 			LabelPosition: "right",
 			FormItems:     make([]*FormItems, 0),
 			rules:         map[string]interface{}{},

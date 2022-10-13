@@ -41,10 +41,7 @@ func (b *Button) Confirm(url string) *ConfirmButton {
 
 func (b *Button) Edit() *DialogButton {
 	formRender := GetForm(b.Context)
-	formRender.OnSubmit(`function() {
-		console.log(this.__ID__.form)
-		alert("待请求")
-	}`)
+
 	dia := html.NewDialog().SetContext(formRender)
 	b.AddRender(dia)
 

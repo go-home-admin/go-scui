@@ -8,8 +8,7 @@ import (
 
 // Index   列表页面
 func (receiver *Controller) Index(req *grid.IndexRequest, ctx http.Context) (*grid.IndexResponse, error) {
-	table := NewGuiContext(ctx).NewGridTable()
-	return table.ToResponse(), nil
+	return NewGuiContext(ctx).ToResponse(), nil
 }
 
 // GinHandleIndex gin原始路由处理

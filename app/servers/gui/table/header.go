@@ -23,10 +23,7 @@ func (h *Header) add(r base.RenderBase) {
 
 func (h *Header) Create() *DialogButton {
 	formRender := GetForm(h.Context)
-	formRender.OnSubmit(`function() {
-		console.log(this.__ID__.form)
-		alert("待请求")
-	}`)
+
 	dia := html.NewDialog().SetContext(formRender)
 	h.AddRender(dia)
 

@@ -17,7 +17,7 @@ import (
 	"strings"
 )
 
-type Table struct {
+type View struct {
 	*base.View
 	Context GuiContext
 	db      *gorm.DB
@@ -30,6 +30,7 @@ type Table struct {
 
 type GuiContext interface {
 	http.Context
+	Grid(f *View)
 	Form(f *form.DialogForm)
 }
 
@@ -46,11 +47,10 @@ func GetForm(g GuiContext) *form.DialogForm {
 	return f
 }
 
-func NewTable(ctx GuiContext, db *gorm.DB) *Table {
-	t := &Table{
+func NewTable(ctx GuiContext) *View {
+	t := &View{
 		View:    base.NewView("table.vue"),
 		Context: ctx,
-		db:      db,
 		columns: make([]*grid.Column, 0),
 		uri:     "",
 	}
@@ -58,8 +58,12 @@ func NewTable(ctx GuiContext, db *gorm.DB) *Table {
 	return t
 }
 
-func iniTable(t *Table) {
+func iniTable(t *View) {
 
+}
+
+func (g *View) SetDb(db *gorm.DB) {
+	g.db = db
 }
 
 func GetInt(ctx *gin.Context, k string, def int) int {
@@ -76,7 +80,9 @@ func GetInt(ctx *gin.Context, k string, def int) int {
 }
 
 // Paginate 列表数据，分页获取
-func (g *Table) Paginate() ([]*protobuf.Any, int64) {
+func (g *View) Paginate() ([]*protobuf.Any, int64) {
+	g.Context.Grid(g)
+
 	var total int64
 	list := make([]map[string]interface{}, 0)
 	g.db.Count(&total)
@@ -96,7 +102,8 @@ func (g *Table) Paginate() ([]*protobuf.Any, int64) {
 	return got, total
 }
 
-func (g *Table) ToResponse() *grid.IndexResponse {
+func (g *View) ToResponse() *grid.IndexResponse {
+	g.Context.Grid(g)
 	if app.IsDebug() {
 		defer toVueFile(*g)
 	}
@@ -109,7 +116,7 @@ func (g *Table) ToResponse() *grid.IndexResponse {
 	}
 }
 
-func toVueFile(g Table) {
+func toVueFile(g View) {
 	// 在本地生成一个调试模版
 	vueStr := `
 <template>__template__</template>
@@ -139,25 +146,25 @@ export default {
 }
 
 // NewAction 列操作
-func (g *Table) NewAction() *RowAction {
+func (g *View) NewAction() *RowAction {
 	action := &RowAction{Context: g.Context, t: g}
 	return action
 }
 
 // NewSearch 返回搜索栏
-func (g *Table) NewSearch() *Search {
+func (g *View) NewSearch() *Search {
 	f := NewTableSearch(g.Context)
 	g.View.AddRender(f, "search", "filter")
 	return f
 }
 
-func (g *Table) NewHeader() *Header {
+func (g *View) NewHeader() *Header {
 	r := NewHeader(g.Context)
 	g.View.AddRender(r, "header")
 	return r
 }
 
-func (g *Table) Column(label string, prop string) *Column {
+func (g *View) Column(label string, prop string) *Column {
 	c := Column{
 		Column: &grid.Column{
 			Label:   label,
@@ -170,7 +177,7 @@ func (g *Table) Column(label string, prop string) *Column {
 	return &c
 }
 
-func (g *Table) GetColumn() []*grid.Column {
+func (g *View) GetColumn() []*grid.Column {
 	for _, column := range g.columns {
 		if column.Template == "" {
 			// column.Template = column.R
@@ -180,18 +187,18 @@ func (g *Table) GetColumn() []*grid.Column {
 	return g.columns
 }
 
-func (g *Table) SetUri(v string) {
+func (g *View) SetUri(v string) {
 	g.uri = app.Config("app.url", "http:127.0.0.1:8080") + v
 }
 
-func (g *Table) GetUri() string {
+func (g *View) GetUri() string {
 	if g.uri == "" {
 		g.uri = app.Config("app.url", "http:127.0.0.1:8080") + g.Context.Gin().Request.URL.Path + "/list"
 	}
 	return g.uri
 }
 
-func (g *Table) GetData() map[string]interface{} {
+func (g *View) GetData() map[string]interface{} {
 	g.View.AddData("columns", g.GetColumn())
 	g.View.AddData("url", g.GetUri())
 

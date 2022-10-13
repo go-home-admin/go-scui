@@ -7,7 +7,7 @@ import (
 type RowAction struct {
 	Context GuiContext
 
-	t *Table
+	t *View
 }
 
 func (r *RowAction) AddButton(text string) *Button {
