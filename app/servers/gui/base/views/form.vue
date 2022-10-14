@@ -15,7 +15,8 @@ export default {
   data() {
     return {
       "__ID__": {
-        "form": {}
+        "form": {},
+        "url": ""
       }
     }
   },
@@ -24,8 +25,7 @@ export default {
       this.__ID__.form = form
     },
     __ID__onSubmit: function () {
-      console.log(this.__ID__.form)
-      alert("待请求")
+      this.$HTTP.post(this.__ID__.url, this.__ID__.form)
     },
   }
 }

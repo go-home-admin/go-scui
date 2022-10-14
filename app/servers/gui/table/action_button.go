@@ -21,6 +21,12 @@ func NewButton(ctx GuiContext, text string) *Button {
 	}
 }
 
+// Click 设置点击时间函数
+func (b *Button) Click(fun string) *Button {
+	b.attr = append(b.attr, `@click="`+fun+`"`)
+	return b
+}
+
 // Confirm 确认后请求, url 中的 {{ row.id }} 会作为代码执行
 func (b *Button) Confirm(url string) *ConfirmButton {
 	funName, code := base.LoadJsFunction("button_confirm.js")
@@ -47,14 +53,15 @@ func (b *Button) Edit() *DialogButton {
 
 	dialogButton := &DialogButton{Button: b}
 	b.attr = append(b.attr, `@click="__ID__DialogOpen(row)"`)
-	dialogButton.AddMethods(`__ID__DialogOpen`, base.ReplaceAll(`function (row) {
+	dialogButton.AddMethods(`__ID__DialogOpen`, `function (row) {
 		this.__DIALOG__ = true
 		this.__FORM_ID__SetData(row)
+		this.__FORM_ID__.url = "`+base.ToUrl(b.Context.Gin().Request.URL.Path)+`/edit"
 	}
-	`, []string{
+	`,
 		"__DIALOG__", dia.GetVisibleName(),
 		"__FORM_ID__", formRender.GetID(),
-	}))
+	)
 
 	return dialogButton
 }
@@ -77,9 +84,13 @@ func (b *Button) Dialog(render base.RenderBase) *DialogButton {
 	return dialog
 }
 
-// DialogButton 弹窗
+// DialogButton 按钮弹窗
 type DialogButton struct {
 	*Button
+}
+
+func NewDialogButton(b *Button) *DialogButton {
+	return &DialogButton{Button: b}
 }
 
 func (b *Button) GetTemplate(pr ...base.RenderBase) string {

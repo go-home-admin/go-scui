@@ -213,10 +213,16 @@ func (r *Render) GetData() map[string]interface{} {
 	return nData
 }
 
-func (r *Render) AddMethods(funName string, code string) {
+// AddMethods 函数名称, 函数js代码, 如果跨组件通常存在其他的ID需要替换
+func (r *Render) AddMethods(funName string, code string, reps ...string) {
+	if len(reps) != 0 {
+		code = ReplaceAll(code, reps)
+	}
+
 	r.MethodsRender[r.RepID(funName)] = r.RepID(code)
 }
 
+// AddMounted 新增打开页面执行的代码, k作为唯一键, 防止重复新增
 func (r *Render) AddMounted(k, code string) {
 	r.MountedRender[k] = r.RepID(code)
 }

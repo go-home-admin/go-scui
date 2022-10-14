@@ -22,20 +22,13 @@ service UserGrid {
 	rpc Export(grid.ExportRequest)returns(grid.ExportResponse){
 		option (http.Get) = "/user/export";
 	}
-	// 创建数据的页面
-	rpc Create(grid.CreateRequest)returns(grid.CreateResponse){
-		option (http.Get) = "/user/create";
-	}
 	// 提交创建的数据
 	rpc Store(grid.StoreRequest)returns(grid.StoreResponse){
 		option (http.Post) = "/user/create";
 	}
-	// 编辑数据的页面
-	rpc Edit(grid.EditRequest)returns(grid.EditResponse){
-		option (http.Get) = "/user/edit";
-	}
+
 	// 提交编辑的数据
 	rpc Update(grid.UpdateRequest)returns(grid.UpdateResponse){
-		option (http.Put) = "/user/edit";
+		option (http.Post) = "/user/edit";
 	}
 }

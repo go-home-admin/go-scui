@@ -51,15 +51,11 @@ message ExportRequest {
 	home.protobuf.Any from = 3;
 }
 message ExportResponse {}
-// 创建数据的页面
-message CreateRequest {}
-message CreateResponse {}
+
 // 提交创建的数据
 message StoreRequest {}
 message StoreResponse {}
-// 编辑数据的页面
-message EditRequest {}
-message EditResponse {}
+
 // 提交编辑的数据
 message UpdateRequest {}
 message UpdateResponse {}
