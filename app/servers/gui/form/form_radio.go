@@ -4,30 +4,30 @@ import (
 	"github.com/go-home-admin/go-admin/app/servers/gui/base"
 )
 
-const input = `
-<el-form-item label="__label__" prop="__prop__">
-	<__component__ v-model="__FORM__.__prop__" __options__ clearable></__component__>
+const inputRadio = `
+<el-form-item  prop="__prop__">
+	<__component__ v-model="__FORM__.__prop__" __options__ >
+		__label__
+	</__component__>
 </el-form-item>
 `
 
-type InputFormItems struct {
+type RadioPickerFormItems struct {
 	formID string
 	*base.Render
 	formItems *FormItems
 }
 
-// Input 普通组件
-func (f *Form) Input(prop, label string) *InputFormItems {
-	item := &InputFormItems{
+// Radio 普通组件
+func (f *Form) Radio(prop, label string) *RadioPickerFormItems {
+	item := &RadioPickerFormItems{
 		formID: f.GetID(),
-		Render: base.NewRender(input),
+		Render: base.NewRender(inputRadio),
 		formItems: &FormItems{
 			Label:     label,
 			Name:      prop,
-			Component: "el-input",
-			Options: map[string]interface{}{
-				"placeholder": label,
-			},
+			Component: "el-radio",
+			Options:   map[string]interface{}{},
 		},
 	}
 	f.AddFormData(prop, "")
@@ -35,7 +35,12 @@ func (f *Form) Input(prop, label string) *InputFormItems {
 	return item
 }
 
-func (i *InputFormItems) GetTemplate(pr ...base.RenderBase) string {
+func (i *RadioPickerFormItems) Options(key string, value string) *RadioPickerFormItems {
+	i.formItems.Options[key] = value
+	return i
+}
+
+func (i *RadioPickerFormItems) GetTemplate(pr ...base.RenderBase) string {
 	i.Template = base.ReplaceAll(i.Template, []string{
 		"__FORM__", i.formID + ".form",
 		"__depend_data__", i.formID + ".dependData",

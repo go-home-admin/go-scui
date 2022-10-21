@@ -4,27 +4,21 @@ import (
 	"github.com/go-home-admin/go-admin/app/servers/gui/base"
 )
 
-const input = `
-<el-form-item label="__label__" prop="__prop__">
-	<__component__ v-model="__FORM__.__prop__" __options__ clearable></__component__>
-</el-form-item>
-`
-
-type InputFormItems struct {
+type DatePickerFormItems struct {
 	formID string
 	*base.Render
 	formItems *FormItems
 }
 
-// Input 普通组件
-func (f *Form) Input(prop, label string) *InputFormItems {
-	item := &InputFormItems{
+// DatePicker 时间插件
+func (f *Form) DatePicker(prop, label string) *DatePickerFormItems {
+	item := &DatePickerFormItems{
 		formID: f.GetID(),
 		Render: base.NewRender(input),
 		formItems: &FormItems{
 			Label:     label,
 			Name:      prop,
-			Component: "el-input",
+			Component: "el-date-picker",
 			Options: map[string]interface{}{
 				"placeholder": label,
 			},
@@ -35,7 +29,12 @@ func (f *Form) Input(prop, label string) *InputFormItems {
 	return item
 }
 
-func (i *InputFormItems) GetTemplate(pr ...base.RenderBase) string {
+func (i *DatePickerFormItems) Options(key string, value string) *DatePickerFormItems {
+	i.formItems.Options[key] = value
+	return i
+}
+
+func (i *DatePickerFormItems) GetTemplate(pr ...base.RenderBase) string {
 	i.Template = base.ReplaceAll(i.Template, []string{
 		"__FORM__", i.formID + ".form",
 		"__depend_data__", i.formID + ".dependData",
