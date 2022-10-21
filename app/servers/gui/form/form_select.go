@@ -8,7 +8,7 @@ const inputSelect = `
 <el-form-item label="__label__" prop="__prop__">
 	<__component__ v-model="__FORM__.__prop__" __options__ clearable>
 	   <el-option
-		  v-for="item in __depend_data__.__prop__Options"
+		  v-for="item in __prop__options"
 		  :key="item.value"
 		  :label="item.label"
 		  :value="item.value">
@@ -42,22 +42,18 @@ func (f *Form) Select(prop, label string) *SelectFormItems {
 			},
 		},
 	}
-	f.AddDependData(prop+"Options", make([]*SelectOptionItem, 0))
 	f.AddFormData(prop, "")
 	f.AddItems(item)
 	return item
 }
 
-//AddSelectOptions 初始化select选择项
-func (i *SelectFormItems) AddSelectOptions(f *Form, optionsConfig []*SelectOptionItem) *SelectFormItems {
-	f.AddDependData(i.formItems.Name+"Options", optionsConfig)
-	return i
+func (i *SelectFormItems) SelectOptions(list interface{}) {
+	i.AddData(i.formItems.Name+"options", list)
 }
 
 func (i *SelectFormItems) GetTemplate(pr ...base.RenderBase) string {
 	i.Template = base.ReplaceAll(i.Template, []string{
 		"__FORM__", i.formID + ".form",
-		"__depend_data__", i.formID + ".dependData",
 		"__component__", i.formItems.Component,
 		"__label__", i.formItems.Label,
 		"__prop__", i.formItems.Name,

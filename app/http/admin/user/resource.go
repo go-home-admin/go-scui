@@ -52,8 +52,17 @@ func (g *GuiContext) Grid(view *table.View) {
 func (g *GuiContext) Form(f *form.DialogForm) {
 	f.LabelWidth = "150"
 
-	f.AddFormData("ddddd", 222)
-
 	f.Input("nickname", "名称")
 	f.Input("created_at", "注册时间")
+
+	f.Select("category_id", "选择分类").SelectOptions([]map[string]string{
+		{
+			"label": "A",
+			"value": "1",
+		},
+		{
+			"label": "B",
+			"value": "2",
+		},
+	})
 }

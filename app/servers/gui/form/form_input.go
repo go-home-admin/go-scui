@@ -38,7 +38,6 @@ func (f *Form) Input(prop, label string) *InputFormItems {
 func (i *InputFormItems) GetTemplate(pr ...base.RenderBase) string {
 	i.Template = base.ReplaceAll(i.Template, []string{
 		"__FORM__", i.formID + ".form",
-		"__depend_data__", i.formID + ".dependData",
 		"__component__", i.formItems.Component,
 		"__label__", i.formItems.Label,
 		"__prop__", i.formItems.Name,
