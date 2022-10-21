@@ -10,5 +10,5 @@ option go_package = "github.com/go-home-admin/go-admin/generate/proto/admin";
 service User {
 	option (http.RouteGroup) = "admin";
 
-	option (http.Resource) = "/user/:action";
+	option (http.Resource) = "/user";
 }
