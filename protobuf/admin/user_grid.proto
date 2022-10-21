@@ -4,31 +4,11 @@ syntax = "proto3";
 package admin;
 
 import "http_config.proto";
-import "grid.proto";
 
 option go_package = "github.com/go-home-admin/go-admin/generate/proto/admin";
 
-service UserGrid {
+service User {
 	option (http.RouteGroup) = "admin";
-	// 列表页面
-	rpc Index(grid.IndexRequest)returns(grid.IndexResponse){
-		option (http.Get) = "/user";
-	}
-	// 列表数据
-	rpc List(grid.ListRequest)returns(grid.ListResponse){
-		option (http.Get) = "/user/list";
-	}
-	// 列表导出
-	rpc Export(grid.ExportRequest)returns(grid.ExportResponse){
-		option (http.Get) = "/user/export";
-	}
-	// 提交创建的数据
-	rpc Store(grid.StoreRequest)returns(grid.StoreResponse){
-		option (http.Post) = "/user/create";
-	}
 
-	// 提交编辑的数据
-	rpc Update(grid.UpdateRequest)returns(grid.UpdateResponse){
-		option (http.Post) = "/user/edit";
-	}
+	option (http.Resource) = "/user/:action";
 }

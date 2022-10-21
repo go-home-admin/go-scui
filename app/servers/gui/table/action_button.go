@@ -7,13 +7,13 @@ import (
 )
 
 type Button struct {
-	Context GuiContext
+	Context GuiController
 	*base.Render
 
 	attr []string
 }
 
-func NewButton(ctx GuiContext, text string) *Button {
+func NewButton(ctx GuiController, text string) *Button {
 	return &Button{
 		Context: ctx,
 		Render:  base.NewRender(`<el-button __BUTTON__>` + text + `</el-button>`),

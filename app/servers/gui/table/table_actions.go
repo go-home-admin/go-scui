@@ -5,7 +5,7 @@ import (
 )
 
 type RowAction struct {
-	Context GuiContext
+	Context GuiController
 
 	t *View
 }

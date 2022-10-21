@@ -1,18 +1,18 @@
 package table
 
 import (
+	"github.com/gin-gonic/gin"
 	"github.com/go-home-admin/go-admin/app/servers/gui/form"
-	"github.com/go-home-admin/home/app/http"
 	"gorm.io/gorm"
 )
 
 type Search struct {
-	http.Context
+	*gin.Context
 	*form.Form
 	where []*SearchWhere
 }
 
-func NewTableSearch(ctx http.Context) *Search {
+func NewTableSearch(ctx *gin.Context) *Search {
 	search := &Search{
 		Context: ctx,
 		Form:    form.NewTableForm(),

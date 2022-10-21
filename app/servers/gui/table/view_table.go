@@ -8,7 +8,6 @@ import (
 	"github.com/go-home-admin/go-admin/app/servers/gui/form"
 	"github.com/go-home-admin/go-admin/generate/proto/common/grid"
 	"github.com/go-home-admin/home/app"
-	"github.com/go-home-admin/home/app/http"
 	"github.com/go-home-admin/home/protobuf"
 	"github.com/sirupsen/logrus"
 	"gorm.io/gorm"
@@ -19,8 +18,9 @@ import (
 
 type View struct {
 	*base.View
-	Context GuiContext
-	db      *gorm.DB
+	gin        *gin.Context
+	Controller GuiController
+	db         *gorm.DB
 	// 存储列表信息
 	columns []*grid.Column
 	uri     string
@@ -28,13 +28,13 @@ type View struct {
 	action *RowAction
 }
 
-type GuiContext interface {
-	http.Context
+type GuiController interface {
+	Gin() *gin.Context
 	Grid(f *View)
 	Form(f *form.DialogForm)
 }
 
-func GetForm(g GuiContext) *form.DialogForm {
+func GetForm(g GuiController) *form.DialogForm {
 	var f *form.DialogForm
 	i, ok := g.Gin().Get("__gui_form__")
 	if !ok {
@@ -47,12 +47,13 @@ func GetForm(g GuiContext) *form.DialogForm {
 	return f
 }
 
-func NewTable(ctx GuiContext) *View {
+func NewTable(controller GuiController) *View {
 	t := &View{
-		View:    base.NewView("table.vue"),
-		Context: ctx,
-		columns: make([]*grid.Column, 0),
-		uri:     "",
+		View:       base.NewView("table.vue"),
+		gin:        controller.Gin(),
+		Controller: controller,
+		columns:    make([]*grid.Column, 0),
+		uri:        "",
 	}
 	iniTable(t)
 	return t
@@ -81,14 +82,14 @@ func GetInt(ctx *gin.Context, k string, def int) int {
 
 // Paginate 列表数据，分页获取
 func (g *View) Paginate() ([]*protobuf.Any, int64) {
-	g.Context.Grid(g)
+	g.Controller.Grid(g)
 
 	var total int64
 	list := make([]map[string]interface{}, 0)
 	g.db.Count(&total)
 	if total > 0 {
-		Page := GetInt(g.Context.Gin(), "page", 1)
-		PageSize := GetInt(g.Context.Gin(), "pageSize", 20)
+		Page := GetInt(g.Controller.Gin(), "page", 1)
+		PageSize := GetInt(g.Controller.Gin(), "pageSize", 20)
 		offset := (Page - 1) * PageSize
 		tx := g.db.Offset(int(offset)).Limit(PageSize).Find(&list)
 		if tx.Error != nil {
@@ -103,7 +104,7 @@ func (g *View) Paginate() ([]*protobuf.Any, int64) {
 }
 
 func (g *View) ToResponse() *grid.IndexResponse {
-	g.Context.Grid(g)
+	g.Controller.Grid(g)
 	if app.IsDebug() {
 		defer toVueFile(*g)
 	}
@@ -147,19 +148,19 @@ export default {
 
 // NewAction 列操作
 func (g *View) NewAction() *RowAction {
-	action := &RowAction{Context: g.Context, t: g}
+	action := &RowAction{Context: g.Controller, t: g}
 	return action
 }
 
 // NewSearch 返回搜索栏
 func (g *View) NewSearch() *Search {
-	f := NewTableSearch(g.Context)
+	f := NewTableSearch(g.gin)
 	g.View.AddRender(f, "search", "filter")
 	return f
 }
 
 func (g *View) NewHeader() *Header {
-	r := NewHeader(g.Context)
+	r := NewHeader(g.Controller)
 	g.View.AddRender(r, "header")
 	return r
 }
@@ -193,7 +194,7 @@ func (g *View) SetUri(v string) {
 
 func (g *View) GetUri() string {
 	if g.uri == "" {
-		g.uri = app.Config("app.url", "http:127.0.0.1:8080") + g.Context.Gin().Request.URL.Path + "/list"
+		g.uri = app.Config("app.url", "http:127.0.0.1:8080") + g.Controller.Gin().Request.URL.Path + "/list"
 	}
 	return g.uri
 }

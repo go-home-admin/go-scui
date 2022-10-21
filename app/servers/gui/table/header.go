@@ -6,11 +6,11 @@ import (
 )
 
 type Header struct {
-	Context GuiContext
+	Context GuiController
 	*base.Render
 }
 
-func NewHeader(ctx GuiContext) *Header {
+func NewHeader(ctx GuiController) *Header {
 	return &Header{
 		Context: ctx,
 		Render:  base.NewRender(`<slot id="header"/>`),

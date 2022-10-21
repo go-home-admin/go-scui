@@ -178,8 +178,29 @@ func (r *Render) GetTemplate(pr ...RenderBase) string {
 	return r.RepID(template + r.templateAppend)
 }
 
+// AddData 添加组件的数据, ("k.k.1", "2")
 func (r *Render) AddData(k string, v interface{}) {
-	r.data[k] = v
+	r.data = setData(k, r.data, v)
+}
+
+func setData(k string, o map[string]interface{}, v interface{}) map[string]interface{} {
+	arr := strings.Split(k, ".")
+	if len(arr) == 1 {
+		// 最后一个赋值
+		o[k] = v
+	} else {
+		kk := arr[0]
+		nk := k[len(kk)+1:]
+		if _, ok := o[kk]; !ok {
+			o[kk] = make(map[string]interface{})
+		} else if _, ok := o[kk].(map[string]interface{}); !ok {
+			// 覆盖旧的值
+			o[kk] = make(map[string]interface{})
+		}
+		o[kk] = setData(nk, o[kk].(map[string]interface{}), v)
+	}
+
+	return o
 }
 
 func (r *Render) GetData() map[string]interface{} {
