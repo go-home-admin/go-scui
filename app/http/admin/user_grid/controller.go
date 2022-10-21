@@ -31,7 +31,6 @@ func (g *GuiController) Grid(view *table.View) {
 	view.Column("进度", "progress").Avatar()
 
 	action := view.NewAction()
-
 	action.AddButton("删除").Confirm("/del?id={{ row.id }}")
 	action.AddButton("编辑").Edit()
 
@@ -67,4 +66,5 @@ func (g *GuiController) Form(f *form.DialogForm) {
 
 	f.Radio("sex", "男").Options(":label", "0")
 	f.Radio("sex", "女").Options(":label", "1")
+	f.InputNumber("age", "年龄").Min(1).Max(5).Default(2)
 }
