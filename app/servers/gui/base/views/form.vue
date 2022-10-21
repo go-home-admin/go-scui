@@ -16,6 +16,7 @@ export default {
     return {
       "__ID__": {
         "form": {},
+        "rules": {},
         "url": ""
       }
     }

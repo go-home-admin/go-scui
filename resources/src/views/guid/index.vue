@@ -18,7 +18,7 @@ export default {
 						let view = {
 							template: com.template,
 							data() {
-								return Object.assign({}, com.data)
+								return com.data
 							},
 							methods: com.methods ? eval("(" + com.methods + ")") : {},
 							mounted() {
