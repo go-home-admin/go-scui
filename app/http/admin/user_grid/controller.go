@@ -31,6 +31,7 @@ func (g *GuiController) Grid(view *table.View) {
 	view.Column("进度", "progress").Avatar()
 
 	action := view.NewAction()
+
 	action.AddButton("删除").Confirm("/del?id={{ row.id }}")
 	action.AddButton("编辑").Edit()
 
@@ -45,6 +46,25 @@ func (g *GuiController) Grid(view *table.View) {
 }
 
 func (g *GuiController) Form(f *form.DialogForm) {
-	f.Input("nickname", "名称")
-	f.Input("created_at", "注册时间")
+	f.Input("nickname", "姓名")
+	f.Switch("flag", "是否预售")
+	f.DatePicker("start_date", "开始时间")
+	f.DatePicker("end_date", "结束时间")
+	f.DatePicker("start_month", "开始月份").Options("type", "month")
+	f.DatePicker("end_month", "结束月份").Options("type", "month")
+	f.ColorPicker("my_color", "衣服颜色")
+
+	catList := make([]*form.SelectOptionItem, 0)
+	catList = append(catList, &form.SelectOptionItem{
+		Value: "1",
+		Label: "A",
+	})
+	catList = append(catList, &form.SelectOptionItem{
+		Value: "2",
+		Label: "B",
+	})
+	f.Select("cat_id", "选择分类").AddSelectOptions(f.Form, catList)
+
+	f.Radio("sex", "男").Options(":label", "0")
+	f.Radio("sex", "女").Options(":label", "1")
 }

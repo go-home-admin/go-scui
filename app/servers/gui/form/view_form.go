@@ -12,8 +12,9 @@ type Form struct {
 	Size          string       `json:"size"`
 	FormItems     []*FormItems `json:"formItems"`
 
-	rules    map[string]interface{}
-	formData map[string]interface{}
+	rules      map[string]interface{}
+	formData   map[string]interface{}
+	dependData map[string]interface{}
 }
 
 func (f *Form) AddItems(base base.RenderBase) {
@@ -22,6 +23,9 @@ func (f *Form) AddItems(base base.RenderBase) {
 
 func (f *Form) AddFormData(k string, v interface{}) {
 	f.formData[k] = v
+}
+func (f *Form) AddDependData(k string, v interface{}) {
+	f.dependData[k] = v
 }
 
 // OnSubmit 提交函数
@@ -69,15 +73,17 @@ func NewForm() *DialogForm {
 			FormItems:     make([]*FormItems, 0),
 			rules:         map[string]interface{}{},
 			formData:      map[string]interface{}{},
+			dependData:    map[string]interface{}{},
 		},
 	}
 }
 
 func (f *DialogForm) GetData() map[string]interface{} {
 	data := map[string]interface{}{
-		"form":    f.Form.formData,
-		"rules":   false,
-		"loading": false,
+		"form":       f.Form.formData,
+		"dependData": f.Form.dependData,
+		"rules":      false,
+		"loading":    false,
 	}
 
 	return map[string]interface{}{
