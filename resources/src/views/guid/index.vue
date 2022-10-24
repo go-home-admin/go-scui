@@ -27,8 +27,6 @@ export default {
 								}
 							},
 						}
-						console.log(view)
-						console.log(com.template)
 						resolve(view);
 					});
 				})

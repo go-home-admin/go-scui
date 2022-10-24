@@ -73,7 +73,7 @@
 		},
 		props: {
 			tableName: { type: String, default: "" },
-			apiObj: { type: Object, default: () => {} },
+			apiObj: { type: Function, default: () => {} },
 			params: { type: Object, default: () => ({}) },
 			data: { type: Object, default: () => {} },
 			height: { type: [String,Number], default: "100%" },

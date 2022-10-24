@@ -4,19 +4,6 @@ import (
 	"github.com/go-home-admin/go-admin/app/servers/gui/base"
 )
 
-const inputSelect = `
-<el-form-item label="__label__" prop="__prop__">
-	<__component__ v-model="__FORM__.__prop__" __options__ clearable>
-	   <el-option
-		  v-for="item in __prop__options"
-		  :key="item.value"
-		  :label="item.label"
-		  :value="item.value">
-		</el-option>
-	</__component__>
-</el-form-item>
-`
-
 type SelectFormItems struct {
 	formID string
 	*base.Render
@@ -32,7 +19,7 @@ type SelectOptionItem struct {
 func (f *Form) Select(prop, label string) *SelectFormItems {
 	item := &SelectFormItems{
 		formID: f.GetID(),
-		Render: base.NewRender(inputSelect),
+		Render: base.LoadVue("form/select.vue"),
 		formItems: &FormItems{
 			Label:     label,
 			Name:      prop,
@@ -42,22 +29,15 @@ func (f *Form) Select(prop, label string) *SelectFormItems {
 			},
 		},
 	}
+
 	f.AddFormData(prop, "")
 	f.AddItems(item)
+	item.AddRep("__FORM__", item.formID)
+	item.AddRep("__LABEL__", label)
+	item.AddRep("__PROP__", prop)
 	return item
 }
 
 func (i *SelectFormItems) SelectOptions(list interface{}) {
-	i.AddData(i.formItems.Name+"options", list)
-}
-
-func (i *SelectFormItems) GetTemplate(pr ...base.RenderBase) string {
-	i.Template = base.ReplaceAll(i.Template, []string{
-		"__FORM__", i.formID + ".form",
-		"__component__", i.formItems.Component,
-		"__label__", i.formItems.Label,
-		"__prop__", i.formItems.Name,
-		"__options__", i.formItems.GetOpt(),
-	})
-	return i.Template
+	i.AddData("__ID__options", list)
 }

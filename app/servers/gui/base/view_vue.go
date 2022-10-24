@@ -4,6 +4,7 @@ import (
 	"embed"
 	"encoding/json"
 	"github.com/go-home-admin/home/app"
+	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
 	"strings"
@@ -122,6 +123,7 @@ func parserData(wl []*word, i int) (map[string]interface{}, int) {
 	m := map[string]interface{}{}
 	err := json.Unmarshal([]byte(ns), &m)
 	if err != nil {
+		logrus.Error("检查json格式", ns)
 		panic(err)
 	}
 	return m, i
