@@ -7,6 +7,7 @@ import (
 	"github.com/go-home-admin/go-admin/generate/proto/common/grid"
 	"github.com/go-home-admin/home/app/http"
 	"github.com/sirupsen/logrus"
+	"strconv"
 )
 
 func NewGui(ctx *gin.Context) *GinHandle {
@@ -43,6 +44,18 @@ func (g *GinHandle) ActionHandle() {
 			i.Create(g.Context)
 		} else {
 			g.Create(g.Context)
+		}
+	case "edit": // edit
+		if i, ok := g.Controller.(Update); ok {
+			i.Update(g.Context)
+		} else {
+			g.Update(g.Context)
+		}
+	case "del": // edit
+		if i, ok := g.Controller.(Update); ok {
+			i.Update(g.Context)
+		} else {
+			g.Update(g.Context)
 		}
 	default:
 		http.NewContext(g.Context).Fail(errors.New("不支持的路由"))
@@ -83,28 +96,73 @@ func (g *GinHandle) Create(ctx *gin.Context) {
 		return
 	}
 
-	g.Controller.(GetDB).GetDB().Create(&data)
-
+	td := g.Controller.(GetDB).GetDB().Create(&data)
+	if td.Error != nil {
+		logrus.Error(td.Error)
+		http.NewContext(ctx).Fail(errors.New("创建失败"))
+		return
+	}
 	http.NewContext(ctx).Success(nil)
 }
 
 func (g *GinHandle) Update(ctx *gin.Context) {
-	by, _ := ctx.GetRawData()
-	var data map[string]interface{}
-	err := json.Unmarshal(by, &data)
-	if err != nil {
-		logrus.Error(err)
-		return
-	}
-
+	data, all := g.getData(ctx)
 	primary := g.Controller.(GetPrimary).GetPrimary()
-	primaryVal, ok := data[primary]
+	primaryValStringOrFloat64, ok := all[primary]
 	if !ok {
 		logrus.Error("必须要有主键数据才能更新, 当前的主建=" + primary)
 		return
 	}
+	var primaryVal interface{}
+	switch primaryValStringOrFloat64.(type) {
+	case string:
+		primaryVal = primaryValStringOrFloat64
+	case float64:
+		primaryVal = int(primaryValStringOrFloat64.(float64))
+	}
 
-	g.Controller.(GetDB).GetDB().Where("? = ?", primary, primaryVal).Updates(&data)
+	td := g.Controller.(GetDB).GetDB().Where(primary+" = ?", primaryVal).Updates(&data)
+	if td.Error != nil {
+		logrus.Error(td.Error)
+		http.NewContext(ctx).Fail(errors.New("更新失败"))
+		return
+	}
 
 	http.NewContext(ctx).Success(nil)
+}
+
+func (g *GinHandle) getData(ctx *gin.Context) (map[string]interface{}, map[string]interface{}) {
+	by, _ := ctx.GetRawData()
+	var m map[string]interface{}
+	err := json.Unmarshal(by, &m)
+	if err != nil {
+		logrus.Error(err)
+		return nil, nil
+	}
+	data := map[string]interface{}{}
+	if c, ok := g.Controller.(GetFormItems); ok {
+		for _, items := range c.GetFormItems() {
+			if d, ok := m[items.Name]; ok {
+				switch items.ValueType {
+				case "int":
+					d = toInt(d)
+				}
+
+				data[items.Name] = d
+			}
+		}
+	}
+
+	return data, m
+}
+
+func toInt(i interface{}) int {
+	var d int
+	switch i.(type) {
+	case string:
+		d, _ = strconv.Atoi(i.(string))
+	default:
+		d = int(i.(float64))
+	}
+	return d
 }

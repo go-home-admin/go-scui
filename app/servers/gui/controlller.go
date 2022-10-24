@@ -7,6 +7,10 @@ import (
 	"gorm.io/gorm"
 )
 
+type Gin interface {
+	Gin() *gin.Context
+}
+
 type Index interface {
 	Index(ctx *gin.Context)
 }
@@ -58,4 +62,46 @@ func (v *ViewPrimary) GetPrimary() string {
 		return "id"
 	}
 	return v.primary
+}
+
+type FormItems struct {
+	// 对应的数据库字段, 参数类型(存入数据库可以格式化): string、int...
+	Field     string `json:"-"`
+	ValueType string `json:"-"`
+
+	// 输出到前端的字段
+	Label          string                 `json:"label,omitempty"`
+	Name           string                 `json:"name,omitempty"`
+	Value          string                 `json:"value,omitempty"`
+	Component      string                 `json:"component,omitempty"`
+	Span           int                    `json:"span"`
+	Options        map[string]interface{} `json:"options,omitempty"`
+	Rules          map[string]string      `json:"rules,omitempty"`
+	RequiredHandle string                 `json:"required_handle,omitempty"`
+	HideHandle     string                 `json:"hide_handle,omitempty"`
+}
+
+func (i *FormItems) GetOpt() string {
+	s := ""
+	for s2, i2 := range i.Options {
+		switch i2.(type) {
+		case string:
+			s = s + " " + s2 + `="` + i2.(string) + `"`
+		}
+	}
+
+	return s
+}
+
+func (i *FormItems) SaveToInt() *FormItems {
+	i.ValueType = "int"
+	return i
+}
+func (i *FormItems) SaveToString() *FormItems {
+	i.ValueType = "string"
+	return i
+}
+
+type GetFormItems interface {
+	GetFormItems() []*FormItems
 }

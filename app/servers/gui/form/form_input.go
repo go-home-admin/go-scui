@@ -1,6 +1,7 @@
 package form
 
 import (
+	"github.com/go-home-admin/go-admin/app/servers/gui"
 	"github.com/go-home-admin/go-admin/app/servers/gui/base"
 )
 
@@ -13,7 +14,7 @@ const input = `
 type InputFormItems struct {
 	formID string
 	*base.Render
-	formItems *FormItems
+	formItems *gui.FormItems
 }
 
 // Input 普通组件
@@ -21,7 +22,7 @@ func (f *Form) Input(prop, label string) *InputFormItems {
 	item := &InputFormItems{
 		formID: f.GetID(),
 		Render: base.NewRender(input),
-		formItems: &FormItems{
+		formItems: &gui.FormItems{
 			Label:     label,
 			Name:      prop,
 			Component: "el-input",
@@ -32,6 +33,7 @@ func (f *Form) Input(prop, label string) *InputFormItems {
 	}
 	f.AddFormData(prop, "")
 	f.AddItems(item)
+	f.FormItems = append(f.FormItems, item.formItems)
 	return item
 }
 
@@ -44,4 +46,13 @@ func (i *InputFormItems) GetTemplate(pr ...base.RenderBase) string {
 		"__options__", i.formItems.GetOpt(),
 	})
 	return i.Template
+}
+
+func (i *InputFormItems) SaveToInt() *InputFormItems {
+	i.formItems.SaveToInt()
+	return i
+}
+func (i *InputFormItems) SaveToString() *InputFormItems {
+	i.formItems.SaveToString()
+	return i
 }

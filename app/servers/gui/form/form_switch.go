@@ -1,13 +1,14 @@
 package form
 
 import (
+	"github.com/go-home-admin/go-admin/app/servers/gui"
 	"github.com/go-home-admin/go-admin/app/servers/gui/base"
 )
 
 type SwitchFormItems struct {
 	formID string
 	*base.Render
-	formItems *FormItems
+	formItems *gui.FormItems
 }
 
 // Switch 普通组件
@@ -15,7 +16,7 @@ func (f *Form) Switch(prop, label string) *SwitchFormItems {
 	item := &SwitchFormItems{
 		formID: f.GetID(),
 		Render: base.NewRender(input),
-		formItems: &FormItems{
+		formItems: &gui.FormItems{
 			Label:     label,
 			Name:      prop,
 			Component: "el-switch",

@@ -1,6 +1,7 @@
 package form
 
 import (
+	"github.com/go-home-admin/go-admin/app/servers/gui"
 	"github.com/go-home-admin/go-admin/app/servers/gui/base"
 )
 
@@ -15,7 +16,7 @@ const inputRadio = `
 type RadioPickerFormItems struct {
 	formID string
 	*base.Render
-	formItems *FormItems
+	formItems *gui.FormItems
 }
 
 // Radio 普通组件
@@ -23,7 +24,7 @@ func (f *Form) Radio(prop, label string) *RadioPickerFormItems {
 	item := &RadioPickerFormItems{
 		formID: f.GetID(),
 		Render: base.NewRender(inputRadio),
-		formItems: &FormItems{
+		formItems: &gui.FormItems{
 			Label:     label,
 			Name:      prop,
 			Component: "el-radio",

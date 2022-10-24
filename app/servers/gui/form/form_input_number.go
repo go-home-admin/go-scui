@@ -2,6 +2,7 @@ package form
 
 import (
 	"fmt"
+	"github.com/go-home-admin/go-admin/app/servers/gui"
 	"github.com/go-home-admin/go-admin/app/servers/gui/base"
 )
 
@@ -14,7 +15,7 @@ const inputNumber = `
 type InputNumber struct {
 	formID string
 	*base.Render
-	*FormItems
+	*gui.FormItems
 	*Form
 }
 
@@ -23,7 +24,7 @@ func (f *Form) InputNumber(prop, label string) *InputNumber {
 	item := &InputNumber{
 		formID: f.GetID(),
 		Render: base.NewRender(inputNumber),
-		FormItems: &FormItems{
+		FormItems: &gui.FormItems{
 			Label:     label,
 			Name:      prop,
 			Component: "input-number",

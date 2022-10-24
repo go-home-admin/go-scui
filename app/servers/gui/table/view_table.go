@@ -79,6 +79,10 @@ func GetInt(ctx *gin.Context, k string, def int) int {
 	return i
 }
 
+func (g *View) GetFormItems() []*gui.FormItems {
+	return GetForm(g.Controller).GetFormItems()
+}
+
 // Paginate 列表数据，分页获取
 func (g *View) Paginate() ([]*protobuf.Any, int64) {
 	g.Controller.Grid(g)
@@ -178,12 +182,6 @@ func (g *View) Column(label string, prop string) *Column {
 }
 
 func (g *View) GetColumn() []*grid.Column {
-	for _, column := range g.columns {
-		if column.Template == "" {
-			// column.Template = column.R
-		}
-	}
-
 	return g.columns
 }
 

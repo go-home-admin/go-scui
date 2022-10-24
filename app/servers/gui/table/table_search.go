@@ -2,6 +2,7 @@ package table
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/go-home-admin/go-admin/app/servers/gui"
 	"github.com/go-home-admin/go-admin/app/servers/gui/form"
 	"gorm.io/gorm"
 )
@@ -42,14 +43,14 @@ func (s *Search) GetData() map[string]interface{} {
 }
 
 type SearchWhere struct {
-	*form.FormItems
+	*gui.FormItems
 	// 对应的数据库字段
 	Field string
 
 	ormWhere func(db *gorm.DB)
 }
 
-func (s *SearchWhere) ToFormItems() *form.FormItems {
+func (s *SearchWhere) ToFormItems() *gui.FormItems {
 	return s.FormItems
 }
 
@@ -57,7 +58,7 @@ func (s *SearchWhere) ToFormItems() *form.FormItems {
 func (s *Search) Input(prop, label string) *FilterInput {
 	w := &SearchWhere{
 		Field: prop,
-		FormItems: &form.FormItems{
+		FormItems: &gui.FormItems{
 			Label:     label,
 			Name:      prop,
 			Component: "input",

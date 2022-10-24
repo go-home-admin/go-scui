@@ -1,11 +1,14 @@
 package form
 
-import "github.com/go-home-admin/go-admin/app/servers/gui/base"
+import (
+	"github.com/go-home-admin/go-admin/app/servers/gui"
+	"github.com/go-home-admin/go-admin/app/servers/gui/base"
+)
 
 type ColorFormItems struct {
 	formID string
 	*base.Render
-	formItems *FormItems
+	formItems *gui.FormItems
 }
 
 // ColorPicker 颜色选择器
@@ -13,7 +16,7 @@ func (f *Form) ColorPicker(prop, label string) *ColorFormItems {
 	item := &ColorFormItems{
 		formID: f.GetID(),
 		Render: base.NewRender(input),
-		formItems: &FormItems{
+		formItems: &gui.FormItems{
 			Label:     label,
 			Name:      prop,
 			Component: "el-color-picker",

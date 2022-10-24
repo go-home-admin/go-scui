@@ -1,13 +1,14 @@
 package form
 
 import (
+	"github.com/go-home-admin/go-admin/app/servers/gui"
 	"github.com/go-home-admin/go-admin/app/servers/gui/base"
 )
 
 type SelectFormItems struct {
 	formID string
 	*base.Render
-	formItems *FormItems
+	formItems *gui.FormItems
 }
 
 type SelectOptionItem struct {
@@ -20,7 +21,7 @@ func (f *Form) Select(prop, label string) *SelectFormItems {
 	item := &SelectFormItems{
 		formID: f.GetID(),
 		Render: base.LoadVue("form/select.vue"),
-		formItems: &FormItems{
+		formItems: &gui.FormItems{
 			Label:     label,
 			Name:      prop,
 			Component: "el-select",
@@ -32,6 +33,7 @@ func (f *Form) Select(prop, label string) *SelectFormItems {
 
 	f.AddFormData(prop, "")
 	f.AddItems(item)
+	f.FormItems = append(f.FormItems, item.formItems)
 	item.AddRep("__FORM__", item.formID)
 	item.AddRep("__LABEL__", label)
 	item.AddRep("__PROP__", prop)

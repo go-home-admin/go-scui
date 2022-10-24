@@ -1,13 +1,14 @@
 package form
 
 import (
+	"github.com/go-home-admin/go-admin/app/servers/gui"
 	"github.com/go-home-admin/go-admin/app/servers/gui/base"
 )
 
 type DatePickerFormItems struct {
 	formID string
 	*base.Render
-	formItems *FormItems
+	formItems *gui.FormItems
 }
 
 // DatePicker 时间插件
@@ -15,7 +16,7 @@ func (f *Form) DatePicker(prop, label string) *DatePickerFormItems {
 	item := &DatePickerFormItems{
 		formID: f.GetID(),
 		Render: base.NewRender(input),
-		formItems: &FormItems{
+		formItems: &gui.FormItems{
 			Label:     label,
 			Name:      prop,
 			Component: "el-date-picker",
@@ -26,11 +27,18 @@ func (f *Form) DatePicker(prop, label string) *DatePickerFormItems {
 	}
 	f.AddFormData(prop, "")
 	f.AddItems(item)
+	f.FormItems = append(f.FormItems, item.formItems)
 	return item
 }
 
 func (i *DatePickerFormItems) Options(key string, value string) *DatePickerFormItems {
 	i.formItems.Options[key] = value
+	return i
+}
+
+func (i *DatePickerFormItems) YmdHis() *DatePickerFormItems {
+	i.formItems.Options["format"] = "YYYY-MM-DD HH:mm:ss"
+	i.formItems.Options["value-format"] = "YYYY-MM-DD HH:mm:ss"
 	return i
 }
 

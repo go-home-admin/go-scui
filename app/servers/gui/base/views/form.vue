@@ -26,7 +26,9 @@ export default {
       this.__ID__.form = form
     },
     __ID__onSubmit: function () {
-      this.$HTTP.post(this.__ID__.url, this.__ID__.form)
+      this.$HTTP.post(this.__ID__.url, this.__ID__.form).then(res=>{
+        this.$refs.table.refresh()
+      })
     },
   }
 }

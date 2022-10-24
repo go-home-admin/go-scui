@@ -29,7 +29,7 @@ func NewGuiContext(ctx *gin.Context) *GuiContext {
 
 func (g *GuiContext) Grid(view *table.View) {
 	view.Column("ID", "id")
-	view.Column("头像", "icon").Avatar()
+	view.Column("头像", "avatar").Avatar()
 	view.Column("姓名", "nickname").Width("150")
 	view.Column("性别", "sex").Width("150").Filters([]*grid.Filter{{Text: "男", Value: "1"}, {Text: "女", Value: "0"}})
 	view.Column("邮箱", "email").Width("150")
@@ -51,17 +51,19 @@ func (g *GuiContext) Grid(view *table.View) {
 
 func (g *GuiContext) Form(f *form.DialogForm) {
 	f.LabelWidth("80px")
-	f.Input("nickname", "名称")
-	f.DatePicker("created_at", "注册时间")
-
-	f.Select("category_id", "选择分类").SelectOptions([]map[string]string{
+	f.Input("avatar", "头像")
+	f.Input("nickname", "姓名")
+	f.Select("sex", "性别").SelectOptions([]map[string]string{
 		{
-			"label": "A",
+			"label": "男",
 			"value": "1",
 		},
 		{
-			"label": "B",
+			"label": "女",
 			"value": "2",
 		},
 	})
+	f.Input("phone", "手机号").SaveToInt()
+	f.Input("email", "邮箱")
+	f.DatePicker("created_at", "注册时间").YmdHis()
 }
