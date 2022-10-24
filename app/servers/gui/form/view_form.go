@@ -7,13 +7,17 @@ import (
 type Form struct {
 	*base.View
 
-	LabelWidth    string       `json:"labelWidth"`
+	LabelWidthOpt string       `json:"labelWidth"`
 	LabelPosition string       `json:"labelPosition"`
 	Size          string       `json:"size"`
 	FormItems     []*FormItems `json:"formItems"`
 
 	rules    map[string]interface{}
 	formData map[string]interface{}
+}
+
+func (f *Form) LabelWidth(v string) {
+	f.AddRep("__FORM_OPT__", "label-width", v)
 }
 
 func (f *Form) AddItems(base base.RenderBase) {

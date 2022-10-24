@@ -50,8 +50,6 @@ func (g *GuiContext) Grid(view *table.View) {
 }
 
 func (g *GuiContext) Form(f *form.DialogForm) {
-	f.LabelWidth = "150"
-
 	f.Input("nickname", "名称")
 	f.Input("created_at", "注册时间")
 

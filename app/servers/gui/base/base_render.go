@@ -30,9 +30,12 @@ type Render struct {
 	id string
 	// Template 里面的内容如果存在#__ID__, 那么会替换成成组件id
 	// 如果需要插槽, 可以使用<name/>
-	Template       string `json:"-"`
+	Template string `json:"-"`
+	// 追加的模版内容, 直接拼接
 	templateAppend string
 	templateData   map[string]string
+	// 模版自定义替换的内容
+	templateReplace map[string]interface{}
 	// 子组件
 	append []*Slot
 	// 组件拥有的值, 会直接追加到父级data, 所以key最好加前奏, 如果允许多个，那么应该拼接__ID__
@@ -40,7 +43,7 @@ type Render struct {
 	// [函数名称]代码
 	MethodsRender map[string]string `json:"-"`
 	MountedRender map[string]string `json:"-"`
-
+	// 防止反复渲染
 	toTemplate bool
 }
 
@@ -75,13 +78,14 @@ func NewRender(templates ...string) *Render {
 		template = templates[0]
 	}
 	return &Render{
-		id:            Krand(10, KC_RAND_KIND_UPPER),
-		Template:      template,
-		templateData:  make(map[string]string),
-		append:        make([]*Slot, 0),
-		data:          make(map[string]interface{}),
-		MethodsRender: make(map[string]string),
-		MountedRender: make(map[string]string),
+		id:              Krand(10, KC_RAND_KIND_UPPER),
+		Template:        template,
+		templateData:    make(map[string]string),
+		append:          make([]*Slot, 0),
+		data:            make(map[string]interface{}),
+		MethodsRender:   make(map[string]string),
+		MountedRender:   make(map[string]string),
+		templateReplace: make(map[string]interface{}),
 	}
 }
 
@@ -114,6 +118,41 @@ func Krand(size int, kind int) string {
 // GetID 例如同时渲染多个表格，是需要一个key区分
 func (r *Render) GetID() string {
 	return r.id
+}
+
+// AddRep
+// 1, 替换的key, v1="v2"
+// 2, 替换的key, v1
+func (r *Render) AddRep(k string, v ...string) string {
+	if len(v) == 1 {
+		r.templateReplace[k] = v[0]
+	} else {
+		if _, ok := r.templateReplace[k]; !ok {
+			r.templateReplace[k] = map[string]string{v[0]: v[1]}
+		} else {
+			m := r.templateReplace[k].(map[string]string)
+			m[v[0]] = v[1]
+			r.templateReplace[k] = m
+		}
+	}
+
+	return r.id
+}
+
+func (r *Render) RepAll(t string) string {
+	r.AddRep(RenderID, r.GetID())
+	for s, i := range r.templateReplace {
+		switch i.(type) {
+		case string:
+			t = strings.ReplaceAll(t, s, i.(string))
+		case map[string]string:
+			for k3, s3 := range i.(map[string]string) {
+				t = strings.ReplaceAll(t, s, " "+k3+`="`+s3+`"`)
+			}
+		}
+	}
+
+	return t
 }
 
 func (r *Render) RepID(t string) string {
@@ -175,7 +214,7 @@ func (r *Render) GetTemplate(pr ...RenderBase) string {
 		}
 	}
 
-	return r.RepID(template + r.templateAppend)
+	return r.RepAll(template + r.templateAppend)
 }
 
 // AddData 添加组件的数据, ("k.k.1", "2")
