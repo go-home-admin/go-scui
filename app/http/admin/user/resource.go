@@ -23,12 +23,12 @@ func NewGuiContext(ctx *gin.Context) *GuiContext {
 	guid := &GuiContext{GinHandle: gui.NewGui(ctx)}
 	guid.View = table.NewTable(guid)
 	guid.SetController(guid)
+	guid.SetDb(mysql.NewOrmUser().GetDB())
 	return guid
 }
 
 func (g *GuiContext) Grid(view *table.View) {
-	view.SetDb(mysql.NewOrmUser().GetDB())
-
+	view.Column("ID", "id")
 	view.Column("头像", "icon").Avatar()
 	view.Column("姓名", "nickname").Width("150")
 	view.Column("性别", "sex").Width("150").Filters([]*grid.Filter{{Text: "男", Value: "1"}, {Text: "女", Value: "0"}})
@@ -52,7 +52,7 @@ func (g *GuiContext) Grid(view *table.View) {
 func (g *GuiContext) Form(f *form.DialogForm) {
 	f.LabelWidth("80px")
 	f.Input("nickname", "名称")
-	f.Input("created_at", "注册时间")
+	f.DatePicker("created_at", "注册时间")
 
 	f.Select("category_id", "选择分类").SelectOptions([]map[string]string{
 		{

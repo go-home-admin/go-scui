@@ -1,10 +1,12 @@
 package gui
 
 import (
+	"encoding/json"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/go-home-admin/go-admin/generate/proto/common/grid"
 	"github.com/go-home-admin/home/app/http"
+	"github.com/sirupsen/logrus"
 )
 
 func NewGui(ctx *gin.Context) *GinHandle {
@@ -37,10 +39,10 @@ func (g *GinHandle) ActionHandle() {
 	case "list": // 列表数据
 		g.List(g.Context)
 	case "create": // 创建
-		if i, ok := g.Controller.(Index); ok {
-			i.Index(g.Context)
+		if i, ok := g.Controller.(Create); ok {
+			i.Create(g.Context)
 		} else {
-			g.Index(g.Context)
+			g.Create(g.Context)
 		}
 	default:
 		http.NewContext(g.Context).Fail(errors.New("不支持的路由"))
@@ -73,5 +75,36 @@ func (g *GinHandle) List(ctx *gin.Context) {
 }
 
 func (g *GinHandle) Create(ctx *gin.Context) {
+	by, _ := ctx.GetRawData()
+	var data map[string]interface{}
+	err := json.Unmarshal(by, &data)
+	if err != nil {
+		logrus.Error(err)
+		return
+	}
 
+	g.Controller.(GetDB).GetDB().Create(&data)
+
+	http.NewContext(ctx).Success(nil)
+}
+
+func (g *GinHandle) Update(ctx *gin.Context) {
+	by, _ := ctx.GetRawData()
+	var data map[string]interface{}
+	err := json.Unmarshal(by, &data)
+	if err != nil {
+		logrus.Error(err)
+		return
+	}
+
+	primary := g.Controller.(GetPrimary).GetPrimary()
+	primaryVal, ok := data[primary]
+	if !ok {
+		logrus.Error("必须要有主键数据才能更新, 当前的主建=" + primary)
+		return
+	}
+
+	g.Controller.(GetDB).GetDB().Where("? = ?", primary, primaryVal).Updates(&data)
+
+	http.NewContext(ctx).Success(nil)
 }

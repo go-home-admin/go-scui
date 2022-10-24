@@ -4,13 +4,13 @@ import (
 	_ "embed"
 	"encoding/json"
 	"github.com/gin-gonic/gin"
+	"github.com/go-home-admin/go-admin/app/servers/gui"
 	"github.com/go-home-admin/go-admin/app/servers/gui/base"
 	"github.com/go-home-admin/go-admin/app/servers/gui/form"
 	"github.com/go-home-admin/go-admin/generate/proto/common/grid"
 	"github.com/go-home-admin/home/app"
 	"github.com/go-home-admin/home/protobuf"
 	"github.com/sirupsen/logrus"
-	"gorm.io/gorm"
 	"io/ioutil"
 	"strconv"
 	"strings"
@@ -18,9 +18,10 @@ import (
 
 type View struct {
 	*base.View
+	*gui.ViewDB
+	*gui.ViewPrimary
 	gin        *gin.Context
 	Controller GuiController
-	db         *gorm.DB
 	// 存储列表信息
 	columns []*grid.Column
 	uri     string
@@ -49,11 +50,13 @@ func GetForm(g GuiController) *form.DialogForm {
 
 func NewTable(controller GuiController) *View {
 	t := &View{
-		View:       base.NewView("table.vue"),
-		gin:        controller.Gin(),
-		Controller: controller,
-		columns:    make([]*grid.Column, 0),
-		uri:        "",
+		View:        base.NewView("table.vue"),
+		ViewDB:      &gui.ViewDB{},
+		ViewPrimary: &gui.ViewPrimary{},
+		gin:         controller.Gin(),
+		Controller:  controller,
+		columns:     make([]*grid.Column, 0),
+		uri:         "",
 	}
 	iniTable(t)
 	return t
@@ -61,10 +64,6 @@ func NewTable(controller GuiController) *View {
 
 func iniTable(t *View) {
 
-}
-
-func (g *View) SetDb(db *gorm.DB) {
-	g.db = db
 }
 
 func GetInt(ctx *gin.Context, k string, def int) int {
@@ -86,12 +85,12 @@ func (g *View) Paginate() ([]*protobuf.Any, int64) {
 
 	var total int64
 	list := make([]map[string]interface{}, 0)
-	g.db.Count(&total)
+	g.GetDB().Count(&total)
 	if total > 0 {
 		Page := GetInt(g.Controller.Gin(), "page", 1)
 		PageSize := GetInt(g.Controller.Gin(), "pageSize", 20)
 		offset := (Page - 1) * PageSize
-		tx := g.db.Offset(int(offset)).Limit(PageSize).Find(&list)
+		tx := g.GetDB().Offset(int(offset)).Limit(PageSize).Find(&list)
 		if tx.Error != nil {
 			logrus.Error(tx.Error)
 		}
@@ -202,6 +201,7 @@ func (g *View) GetUri() string {
 func (g *View) GetData() map[string]interface{} {
 	g.View.AddData("columns", g.GetColumn())
 	g.View.AddData("url", g.GetUri())
+	g.View.AddData("primary", g.GetPrimary())
 
 	return g.View.GetData()
 }
