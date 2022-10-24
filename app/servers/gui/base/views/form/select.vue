@@ -21,7 +21,7 @@ export default {
     }
   },
   mounted() {
-    init__ID__Options()
+    this.init__ID__Options()
   },
   methods: {
     init__ID__Options() {

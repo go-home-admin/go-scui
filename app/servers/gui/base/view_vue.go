@@ -95,6 +95,14 @@ func parserMethods(wl []*word, i int) (map[string]string, int) {
 			ns = strings.TrimSpace(ns)
 			i2 = i2 + stp
 			m[funName.Str] = ns
+		} else if w.Str == "(" {
+			funName := nl[i2-1]
+			nnl := nl[i2:]
+			_, stp := GetBrackets(nnl, "{", "}")
+			ns := WlToString(nl[i2 : i2+stp+1])
+			ns = strings.TrimSpace(ns)
+			i2 = i2 + stp
+			m[funName.Str] = "function" + ns
 		}
 	}
 
