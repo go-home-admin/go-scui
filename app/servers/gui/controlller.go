@@ -2,8 +2,6 @@ package gui
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/go-home-admin/go-admin/generate/proto/common/grid"
-	"github.com/go-home-admin/home/protobuf"
 	"gorm.io/gorm"
 )
 
@@ -22,11 +20,11 @@ type Update interface {
 }
 
 type ToResponse interface {
-	ToResponse() *grid.IndexResponse
+	ToResponse() *IndexResponse
 }
 
 type Paginate interface {
-	Paginate() ([]*protobuf.Any, int64)
+	Paginate() (interface{}, int64)
 }
 
 type GetDB interface {

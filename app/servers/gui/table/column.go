@@ -1,12 +1,12 @@
 package table
 
 import (
+	"github.com/go-home-admin/go-admin/app/servers/gui"
 	"github.com/go-home-admin/go-admin/app/servers/gui/base"
-	"github.com/go-home-admin/go-admin/generate/proto/common/grid"
 )
 
 type Column struct {
-	*grid.Column
+	*gui.Column
 	*base.Render
 }
 
@@ -25,7 +25,7 @@ func (c *Column) Sortable(v bool) *Column {
 	return c
 }
 
-func (c *Column) Filters(v []*grid.Filter) *Column {
+func (c *Column) Filters(v []*gui.Filter) *Column {
 	c.Column.Filters = v
 	return c
 }

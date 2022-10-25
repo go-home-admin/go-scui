@@ -7,7 +7,6 @@ import (
 	"github.com/go-home-admin/go-admin/app/servers/gui"
 	"github.com/go-home-admin/go-admin/app/servers/gui/base"
 	"github.com/go-home-admin/go-admin/app/servers/gui/form"
-	"github.com/go-home-admin/go-admin/generate/proto/common/grid"
 	"github.com/go-home-admin/home/app"
 	"github.com/go-home-admin/home/protobuf"
 	"github.com/sirupsen/logrus"
@@ -24,7 +23,7 @@ type View struct {
 	gin        *gin.Context
 	Controller GuiController
 	// 存储列表信息
-	columns []*grid.Column
+	columns []*gui.Column
 	uri     string
 
 	action *RowAction
@@ -56,7 +55,7 @@ func NewTable(controller GuiController) *View {
 		ViewPrimary: &gui.ViewPrimary{},
 		gin:         controller.Gin(),
 		Controller:  controller,
-		columns:     make([]*grid.Column, 0),
+		columns:     make([]*gui.Column, 0),
 		uri:         "",
 	}
 	iniTable(t)
@@ -85,7 +84,7 @@ func (g *View) GetFormItems() []*gui.FormItems {
 }
 
 // Paginate 列表数据，分页获取
-func (g *View) Paginate() ([]*protobuf.Any, int64) {
+func (g *View) Paginate() (interface{}, int64) {
 	g.Controller.Grid(g)
 
 	var total int64
@@ -100,20 +99,17 @@ func (g *View) Paginate() ([]*protobuf.Any, int64) {
 			logrus.Error(tx.Error)
 		}
 	}
-	got := make([]*protobuf.Any, 0)
-	for _, m := range list {
-		got = append(got, protobuf.NewAny(m))
-	}
-	return got, total
+
+	return list, total
 }
 
-func (g *View) ToResponse() *grid.IndexResponse {
+func (g *View) ToResponse() *gui.IndexResponse {
 	g.Controller.Grid(g)
 	if app.IsDebug() {
 		defer toVueFile(*g)
 	}
 
-	return &grid.IndexResponse{
+	return &gui.IndexResponse{
 		Template: g.GetTemplate(),
 		Data:     protobuf.NewAny(g.GetData()),
 		Methods:  g.GetMethods(),
@@ -172,10 +168,10 @@ func (g *View) NewHeader() *Header {
 
 func (g *View) Column(label string, prop string) *Column {
 	c := Column{
-		Column: &grid.Column{
+		Column: &gui.Column{
 			Label:   label,
 			Prop:    prop,
-			Filters: make([]*grid.Filter, 0),
+			Filters: make([]*gui.Filter, 0),
 		},
 		Render: base.NewRender(),
 	}
@@ -183,7 +179,7 @@ func (g *View) Column(label string, prop string) *Column {
 	return &c
 }
 
-func (g *View) GetColumn() []*grid.Column {
+func (g *View) GetColumn() []*gui.Column {
 	return g.columns
 }
 

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"github.com/gin-gonic/gin"
-	"github.com/go-home-admin/go-admin/generate/proto/common/grid"
 	"github.com/go-home-admin/home/app/http"
 	"github.com/sirupsen/logrus"
 	"strconv"
@@ -75,7 +74,7 @@ func (g *GinHandle) List(ctx *gin.Context) {
 	context := http.NewContext(ctx)
 	if i, ok := g.Controller.(Paginate); ok {
 		data, total := i.Paginate()
-		context.Success(&grid.ListResponse{
+		context.Success(&ListResponse{
 			Page:     1,
 			PageSize: 15,
 			Rows:     data,

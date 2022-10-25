@@ -6,7 +6,6 @@ import (
 	"github.com/go-home-admin/go-admin/app/servers/gui"
 	"github.com/go-home-admin/go-admin/app/servers/gui/form"
 	"github.com/go-home-admin/go-admin/app/servers/gui/table"
-	"github.com/go-home-admin/go-admin/generate/proto/common/grid"
 )
 
 // GinHandleResource gin原始路由处理
@@ -31,7 +30,7 @@ func (g *GuiContext) Grid(view *table.View) {
 	view.Column("ID", "id")
 	view.Column("头像", "avatar").Avatar()
 	view.Column("姓名", "nickname").Width("150")
-	view.Column("性别", "sex").Width("150").Filters([]*grid.Filter{{Text: "男", Value: "1"}, {Text: "女", Value: "0"}})
+	view.Column("性别", "sex").Width("150").Filters([]*gui.Filter{{Text: "男", Value: "1"}, {Text: "女", Value: "0"}})
 	view.Column("邮箱", "email").Width("150")
 	view.Column("注册时间", "created_at").Width("250").Sortable(true)
 
