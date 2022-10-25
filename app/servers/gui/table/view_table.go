@@ -12,6 +12,7 @@ import (
 	"github.com/go-home-admin/home/protobuf"
 	"github.com/sirupsen/logrus"
 	"io/ioutil"
+	"os"
 	"strconv"
 	"strings"
 )
@@ -143,6 +144,7 @@ export default {
 		"__mounted__", g.GetMounted(),
 		"__methods__", g.GetMethods(),
 	})
+	_ = os.MkdirAll("resources/gui/", 0755)
 	err := ioutil.WriteFile("resources/gui/"+strings.ReplaceAll(g.GetUri(), "/", "")+".vue", []byte(vueStr), 0755)
 	if err != nil {
 		logrus.Error(err)

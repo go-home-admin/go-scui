@@ -53,15 +53,9 @@ func (g *GuiContext) Form(f *form.DialogForm) {
 	f.LabelWidth("80px")
 	f.Input("avatar", "头像")
 	f.Input("nickname", "姓名")
-	f.Select("sex", "性别").SelectOptions([]map[string]string{
-		{
-			"label": "男",
-			"value": "1",
-		},
-		{
-			"label": "女",
-			"value": "2",
-		},
+	f.Select("sex", "性别").SelectOptions(gui.SelectOptions{
+		{Label: "男", Value: 1},
+		{Label: "女", Value: 0},
 	})
 	f.Input("phone", "手机号").SaveToInt()
 	f.Input("email", "邮箱")

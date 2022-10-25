@@ -1,6 +1,6 @@
 <template>
   <el-form-item label="__LABEL__" prop="__PROP__">
-    <el-select v-model="__FORM__.__PROP__" __options__ clearable>
+    <el-select v-model="__FORM__.form.__PROP__" __options__ clearable>
       <el-option
           v-for="item in __ID__options"
           :key="item.value"
