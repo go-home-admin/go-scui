@@ -28,7 +28,7 @@ type Column struct {
 	// 状态翻译
 	Filters []Filter `json:"filters,omitempty" form:"filters"`
 	// Vue 模板
-	Template string `json:"template,omitempty" form:"template"`
+	Template string `json:"template,omitempty" form:"-"`
 }
 
 // 这里应该输出一个完整的组件格式

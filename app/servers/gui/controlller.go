@@ -5,6 +5,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// TryNumberToInt64 尝试对所有数字类型转int64
 func TryNumberToInt64(i interface{}) int64 {
 	switch i.(type) {
 	case int:
@@ -17,7 +18,10 @@ func TryNumberToInt64(i interface{}) int64 {
 		return i.(int64)
 	case uint64:
 		return int64(i.(uint64))
-
+	case float32:
+		return int64(i.(float32))
+	case float64:
+		return int64(i.(float64))
 	}
 	return 0
 }

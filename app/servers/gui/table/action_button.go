@@ -1,6 +1,7 @@
 package table
 
 import (
+	"github.com/go-home-admin/go-admin/app/servers/gui"
 	"github.com/go-home-admin/go-admin/app/servers/gui/base"
 	"github.com/go-home-admin/go-admin/app/servers/gui/html"
 	"strings"
@@ -43,6 +44,14 @@ func (b *Button) Confirm(url string) *ConfirmButton {
 	return &ConfirmButton{
 		Button: b, funName: funName,
 	}
+}
+
+func (b *Button) Delete() *ConfirmButton {
+	if c, ok := b.Context.(gui.GetPrimary); ok {
+		return b.Confirm("/del?id={{ row." + c.GetPrimary() + " }}")
+	}
+
+	return b.Confirm("/del?id={{ row.id }}")
 }
 
 func (b *Button) Edit() *DialogButton {

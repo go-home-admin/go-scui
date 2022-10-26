@@ -1,16 +1,19 @@
 package table
 
 import (
+	"fmt"
 	"github.com/go-home-admin/go-admin/app/servers/gui"
 	"github.com/go-home-admin/go-admin/app/servers/gui/base"
 	"github.com/sirupsen/logrus"
 	time2 "time"
 )
 
+type Row map[string]interface{}
+
 type Column struct {
 	*gui.Column
 	*base.Render
-	funcs []func(interface{}, interface{}) interface{}
+	funcs []func(interface{}, Row) interface{}
 	// k=>v (k 数字类型只会是int64)
 	mapVal map[interface{}]interface{}
 }
@@ -21,7 +24,7 @@ func NewColumn() *Column {
 			Filters: make([]gui.Filter, 0),
 		},
 		Render: base.NewRender(),
-		funcs:  make([]func(interface{}, interface{}) interface{}, 0),
+		funcs:  make([]func(interface{}, Row) interface{}, 0),
 		mapVal: make(map[interface{}]interface{}),
 	}
 }
@@ -47,7 +50,7 @@ func (c *Column) Date(format ...string) *Column {
 		format = append(format, "2006-01-02 15:04:05")
 	}
 
-	c.Display(func(val interface{}, row interface{}) interface{} {
+	c.Display(func(val interface{}, row Row) interface{} {
 		switch val.(type) {
 		case time2.Time:
 			t := val.(time2.Time)
@@ -61,20 +64,36 @@ func (c *Column) Date(format ...string) *Column {
 
 func (c *Column) Filters(v []gui.Filter) *Column {
 	c.Column.Filters = v
-	for _, filter := range v {
-		c.Translate(filter.Value, filter.Text)
-	}
-	c.addMapVal()
+	c.Using(v)
 	return c
 }
 
+// Using 不同值不同显示
+func (c *Column) Using(v []gui.Filter) *Column {
+	newKey := "__" + c.Prop + "__"
+	c.Display(func(val interface{}, row Row) interface{} {
+		for _, filter := range v {
+			row["__"+c.Prop+"__"] = val
+			if fmt.Sprint(filter.Value) == fmt.Sprint(val) {
+				row[newKey] = fmt.Sprint(filter.Text)
+				break
+			}
+		}
+		return val
+	})
+
+	c.Template("<template #" + c.Prop + "=\"scope\">{{ scope.row." + newKey + "}}</template>")
+	return c
+}
+
+// Template 放到插槽 el-table-column
 func (c *Column) Template(v string) *Column {
-	c.Column.Template = v
+	c.Render.Template = v
 	return c
 }
 
 // Display 自定义处理值 val 当前值 row 行
-func (c *Column) Display(f func(val interface{}, row interface{}) interface{}) *Column {
+func (c *Column) Display(f func(val interface{}, row Row) interface{}) *Column {
 	c.funcs = append(c.funcs, f)
 	return c
 }
@@ -84,14 +103,19 @@ func (c *Column) Translate(k, v interface{}) *Column {
 	switch k.(type) {
 	case string:
 		c.mapVal[k] = v
-	default:
+	case int, int32, uint32, int64, uint64, float32, float64:
 		c.mapVal[gui.TryNumberToInt64(k)] = v
+	default:
+		c.mapVal[k] = v
+	}
+	if len(c.funcs) == 0 {
+		c.addMapVal()
 	}
 	return c
 }
 
 func (c *Column) addMapVal() *Column {
-	c.Display(func(val interface{}, row interface{}) interface{} {
+	c.Display(func(val interface{}, row Row) interface{} {
 		if kk, ok := c.mapVal[val]; ok {
 			return kk
 		}
@@ -105,6 +129,7 @@ func (c *Column) addMapVal() *Column {
 	return c
 }
 
+// Map 替换值, 不想被替换应该使用Using
 func (c *Column) Map(v interface{}) *Column {
 	switch v.(type) {
 	case map[string]string:

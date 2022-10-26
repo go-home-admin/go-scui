@@ -107,8 +107,7 @@ func (g *View) Paginate() (interface{}, int64) {
 	if total > 0 {
 		Page := GetInt(g.Controller.Gin(), "page", 1)
 		PageSize := GetInt(g.Controller.Gin(), "pageSize", 20)
-		offset := (Page - 1) * PageSize
-		tx := g.GetDB().Offset(int(offset)).Limit(PageSize).Find(&list)
+		tx := g.GetDB().Offset((Page - 1) * PageSize).Limit(PageSize).Find(&list)
 		if tx.Error != nil {
 			logrus.Error(tx.Error)
 		}
@@ -157,10 +156,10 @@ export default {
 `
 	d, _ := json.Marshal(g.GetData())
 	vueStr = base.ReplaceAll(vueStr, []string{
-		"__template__", g.GetTemplate(),
+		"__template__", (*g.Render).GetTemplate(),
 		"__data__", string(d),
-		"__mounted__", g.GetMounted(),
-		"__methods__", g.GetMethods(),
+		"__mounted__", (*g.Render).GetMounted(),
+		"__methods__", (*g.Render).GetMethods(),
 	})
 	_ = os.MkdirAll("resources/gui/", 0755)
 	err := ioutil.WriteFile("resources/gui/"+strings.ReplaceAll(g.GetUri(), "/", "")+".vue", []byte(vueStr), 0755)
@@ -194,6 +193,16 @@ func (g *View) Column(label string, prop string) *Column {
 	c.Column.Prop = prop
 	g.columns = append(g.columns, c)
 	return c
+}
+
+func (g *View) GetTemplate(pr ...base.RenderBase) string {
+	for _, column := range g.columns {
+		if column.Render.Template != "" {
+			g.AddRender(column, "el-table-column")
+		}
+	}
+
+	return g.Render.GetTemplate(pr...)
 }
 
 func (g *View) GetColumn() []*Column {
