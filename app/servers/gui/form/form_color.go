@@ -29,13 +29,11 @@ func (f *Form) ColorPicker(prop, label string) *ColorFormItems {
 }
 
 func (i *ColorFormItems) GetTemplate(pr ...base.RenderBase) string {
-	i.Template = base.ReplaceAll(i.Template, []string{
-		"__FORM__", i.formID + ".form",
-		"__depend_data__", i.formID + ".dependData",
-		"__component__", i.formItems.Component,
-		"__label__", i.formItems.Label,
-		"__prop__", i.formItems.Name,
-		"__options__", i.formItems.GetOpt(),
-	})
-	return i.Template
+	i.AddRep("__FORM__", i.formID+".form")
+	i.AddRep("__depend_data__", i.formID+".dependData")
+	i.AddRep("__component__", i.formItems.Component)
+	i.AddRep("__label__", i.formItems.Label)
+	i.AddRep("__prop__", i.formItems.Name)
+	i.AddRep("__options__", i.formItems.GetOpt())
+	return i.Render.GetTemplate(pr...)
 }

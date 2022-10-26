@@ -15,7 +15,7 @@ type DatePickerFormItems struct {
 func (f *Form) DatePicker(prop, label string) *DatePickerFormItems {
 	item := &DatePickerFormItems{
 		formID: f.GetID(),
-		Render: base.NewRender(input),
+		Render: base.LoadVue("form/date_picker.vue"),
 		formItems: &gui.FormItems{
 			Label:     label,
 			Name:      prop,
@@ -28,28 +28,22 @@ func (f *Form) DatePicker(prop, label string) *DatePickerFormItems {
 	f.AddFormData(prop, "")
 	f.AddItems(item)
 	f.FormItems = append(f.FormItems, item.formItems)
+	item.AddRep("__FORM__", f.GetID())
+	item.AddRep("__PROP__", prop)
+	item.AddRep("__LABEL__", label)
+	item.AddRep("__KV__", "")
 	return item
 }
 
-func (i *DatePickerFormItems) Options(key string, value string) *DatePickerFormItems {
-	i.formItems.Options[key] = value
-	return i
-}
-
 func (i *DatePickerFormItems) Ymd() *DatePickerFormItems {
-	i.formItems.Options["format"] = "YYYY-MM-DD"
-	i.formItems.Options["value-format"] = "YYYY-MM-DD"
+	i.AddAttr("format", "YYYY-MM-DD HH:mm:ss")
+	i.AddAttr("value-format", "YYYY-MM-DD HH:mm:ss")
 	return i
 }
 
-func (i *DatePickerFormItems) GetTemplate(pr ...base.RenderBase) string {
-	i.Template = base.ReplaceAll(i.Template, []string{
-		"__FORM__", i.formID + ".form",
-		"__depend_data__", i.formID + ".dependData",
-		"__component__", i.formItems.Component,
-		"__label__", i.formItems.Label,
-		"__prop__", i.formItems.Name,
-		"__options__", i.formItems.GetOpt(),
-	})
-	return i.Template
+// AddAttr 拼接成 key=""
+func (i *DatePickerFormItems) AddAttr(k, v string) *DatePickerFormItems {
+	i.AddRep("__KV__", k, v)
+
+	return i
 }
