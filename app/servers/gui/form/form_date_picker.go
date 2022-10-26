@@ -36,9 +36,9 @@ func (i *DatePickerFormItems) Options(key string, value string) *DatePickerFormI
 	return i
 }
 
-func (i *DatePickerFormItems) YmdHis() *DatePickerFormItems {
-	i.formItems.Options["format"] = "YYYY-MM-DD HH:mm:ss"
-	i.formItems.Options["value-format"] = "YYYY-MM-DD HH:mm:ss"
+func (i *DatePickerFormItems) Ymd() *DatePickerFormItems {
+	i.formItems.Options["format"] = "YYYY-MM-DD"
+	i.formItems.Options["value-format"] = "YYYY-MM-DD"
 	return i
 }
 

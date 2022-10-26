@@ -1,0 +1,48 @@
+package form
+
+import (
+	"github.com/go-home-admin/go-admin/app/servers/gui"
+	"github.com/go-home-admin/go-admin/app/servers/gui/base"
+)
+
+type DateTimePickerFormItems struct {
+	formID string
+	*base.Render
+	formItems *gui.FormItems
+}
+
+// DateTimePicker 时间插件
+func (f *Form) DateTimePicker(prop, label string) *DateTimePickerFormItems {
+	item := &DateTimePickerFormItems{
+		formID: f.GetID(),
+		Render: base.LoadVue("form/date_time_picker.vue"),
+		formItems: &gui.FormItems{
+			Label:     label,
+			Name:      prop,
+			Component: "el-date-picker",
+			Options: map[string]interface{}{
+				"placeholder": label,
+			},
+		},
+	}
+	f.AddFormData(prop, "")
+	f.AddItems(item)
+	f.FormItems = append(f.FormItems, item.formItems)
+	item.AddRep("__FORM__", f.GetID())
+	item.AddRep("__PROP__", prop)
+	item.AddRep("__LABEL__", label)
+	item.AddRep("__KV__", "")
+	return item
+}
+
+func (i *DateTimePickerFormItems) AddAttr(k, v string) *DateTimePickerFormItems {
+	i.AddRep("__KV__", k, v)
+
+	return i
+}
+
+func (i *DateTimePickerFormItems) YmdHis() *DateTimePickerFormItems {
+	i.AddAttr("format", "YYYY-MM-DD HH:mm:ss")
+	i.AddAttr("value-format", "YYYY-MM-DD HH:mm:ss")
+	return i
+}

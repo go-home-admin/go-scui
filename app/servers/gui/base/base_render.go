@@ -130,6 +130,10 @@ func (r *Render) AddRep(k string, v ...string) string {
 		if _, ok := r.templateReplace[k]; !ok {
 			r.templateReplace[k] = map[string]string{v[0]: v[1]}
 		} else {
+			switch r.templateReplace[k].(type) {
+			case string:
+				r.templateReplace[k] = map[string]string{v[0]: v[1]}
+			}
 			m := r.templateReplace[k].(map[string]string)
 			m[v[0]] = v[1]
 			r.templateReplace[k] = m
@@ -146,9 +150,11 @@ func (r *Render) RepAll(t string) string {
 		case string:
 			t = strings.ReplaceAll(t, s, i.(string))
 		case map[string]string:
+			str := ""
 			for k3, s3 := range i.(map[string]string) {
-				t = strings.ReplaceAll(t, s, " "+k3+`="`+s3+`"`)
+				str += " " + k3 + `="` + s3 + `"`
 			}
+			t = strings.ReplaceAll(t, s, str)
 		}
 	}
 

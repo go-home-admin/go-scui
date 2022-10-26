@@ -30,9 +30,9 @@ func (g *GuiContext) Grid(view *table.View) {
 	view.Column("ID", "id")
 	view.Column("头像", "avatar").Avatar()
 	view.Column("姓名", "nickname").Width("150")
-	view.Column("性别", "sex").Width("150").Filters([]*gui.Filter{{Text: "男", Value: "1"}, {Text: "女", Value: "0"}})
+	view.Column("性别", "sex").Width("150").Filters([]gui.Filter{{Text: "男", Value: 1}, {Text: "女", Value: 0}})
 	view.Column("邮箱", "email").Width("150")
-	view.Column("注册时间", "created_at").Width("250").Sortable(true)
+	view.Column("注册时间", "created_at").Width("250").Sortable(true).Date()
 
 	action := view.NewAction()
 	action.AddButton("删除").Confirm("/del?id={{ row.id }}")
@@ -58,5 +58,5 @@ func (g *GuiContext) Form(f *form.DialogForm) {
 	})
 	f.Input("phone", "手机号").SaveToInt()
 	f.Input("email", "邮箱")
-	f.DatePicker("created_at", "注册时间").YmdHis()
+	f.DateTimePicker("created_at", "注册时间").YmdHis()
 }

@@ -1,9 +1,5 @@
 package gui
 
-import (
-	"github.com/go-home-admin/home/protobuf"
-)
-
 type SelectOptions []Options
 
 type Options struct {
@@ -14,8 +10,8 @@ type Options struct {
 type FilterOptions []Filter
 
 type Filter struct {
-	Text  string `json:"text,omitempty"`
-	Value string `json:"value,omitempty"`
+	Text  string      `json:"text,omitempty"`
+	Value interface{} `json:"value,omitempty"`
 }
 
 type Column struct {
@@ -30,7 +26,7 @@ type Column struct {
 	// 是否开启排序
 	Sortable bool `json:"sortable,omitempty" form:"sortable"`
 	// 状态翻译
-	Filters []*Filter `json:"filters,omitempty" form:"filters"`
+	Filters []Filter `json:"filters,omitempty" form:"filters"`
 	// Vue 模板
 	Template string `json:"template,omitempty" form:"template"`
 }
@@ -40,7 +36,7 @@ type IndexResponse struct {
 	// 这里是同平常一样的 Vue 组件选项
 	Template string `protobuf:"bytes,1,opt,name=template,proto3" json:"template,omitempty" form:"template"`
 	// 组件数据
-	Data *protobuf.Any `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty" form:"data"`
+	Data interface{} `protobuf:"bytes,2,opt,name=data,proto3" json:"data,omitempty" form:"data"`
 	// js 函数 {}
 	Methods string `protobuf:"bytes,3,opt,name=methods,proto3" json:"methods,omitempty" form:"methods"`
 	// js 执行代码

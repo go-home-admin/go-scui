@@ -7,8 +7,8 @@ import (
 	"github.com/go-home-admin/go-admin/app/servers/gui"
 	"github.com/go-home-admin/go-admin/app/servers/gui/base"
 	"github.com/go-home-admin/go-admin/app/servers/gui/form"
+	"github.com/go-home-admin/go-admin/app/servers/gui/html"
 	"github.com/go-home-admin/home/app"
-	"github.com/go-home-admin/home/protobuf"
 	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
@@ -23,7 +23,7 @@ type View struct {
 	gin        *gin.Context
 	Controller GuiController
 	// 存储列表信息
-	columns []*gui.Column
+	columns []*Column
 	uri     string
 
 	action *RowAction
@@ -33,6 +33,20 @@ type GuiController interface {
 	Gin() *gin.Context
 	Grid(f *View)
 	Form(f *form.DialogForm)
+}
+
+func GetEditDialog(ctx *gin.Context, form, button base.RenderBase) *html.Dialog {
+	var dia *html.Dialog
+	i, ok := ctx.Get("__gui_edit__")
+	if !ok {
+		dia = html.NewDialog().SetContext(form)
+		button.AddRender(dia)
+		ctx.Set("__gui_edit__", dia)
+	} else {
+		dia = i.(*html.Dialog)
+	}
+
+	return dia
 }
 
 func GetForm(g GuiController) *form.DialogForm {
@@ -55,7 +69,7 @@ func NewTable(controller GuiController) *View {
 		ViewPrimary: &gui.ViewPrimary{},
 		gin:         controller.Gin(),
 		Controller:  controller,
-		columns:     make([]*gui.Column, 0),
+		columns:     make([]*Column, 0),
 		uri:         "",
 	}
 	iniTable(t)
@@ -98,6 +112,14 @@ func (g *View) Paginate() (interface{}, int64) {
 		if tx.Error != nil {
 			logrus.Error(tx.Error)
 		}
+		for _, column := range g.columns {
+			for _, f := range column.funcs {
+				for i, row := range list {
+					row[column.Prop] = f(row[column.Prop], row)
+					list[i] = row
+				}
+			}
+		}
 	}
 
 	return list, total
@@ -111,7 +133,7 @@ func (g *View) ToResponse() *gui.IndexResponse {
 
 	return &gui.IndexResponse{
 		Template: g.GetTemplate(),
-		Data:     protobuf.NewAny(g.GetData()),
+		Data:     g.GetData(),
 		Methods:  g.GetMethods(),
 		Mounted:  g.GetMounted(),
 	}
@@ -167,19 +189,14 @@ func (g *View) NewHeader() *Header {
 }
 
 func (g *View) Column(label string, prop string) *Column {
-	c := Column{
-		Column: &gui.Column{
-			Label:   label,
-			Prop:    prop,
-			Filters: make([]*gui.Filter, 0),
-		},
-		Render: base.NewRender(),
-	}
-	g.columns = append(g.columns, c.Column)
-	return &c
+	c := NewColumn()
+	c.Column.Label = label
+	c.Column.Prop = prop
+	g.columns = append(g.columns, c)
+	return c
 }
 
-func (g *View) GetColumn() []*gui.Column {
+func (g *View) GetColumn() []*Column {
 	return g.columns
 }
 

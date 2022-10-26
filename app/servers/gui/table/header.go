@@ -2,7 +2,6 @@ package table
 
 import (
 	"github.com/go-home-admin/go-admin/app/servers/gui/base"
-	"github.com/go-home-admin/go-admin/app/servers/gui/html"
 )
 
 type Header struct {
@@ -25,9 +24,7 @@ func (h *Header) add(r base.RenderBase) {
 // Create 创建按钮
 func (h *Header) Create() *DialogButton {
 	formRender := GetForm(h.Context)
-
-	dia := html.NewDialog().SetContext(formRender)
-	h.AddRender(dia)
+	dia := GetEditDialog(h.Context.Gin(), formRender, h)
 
 	button := NewButton(h.Context, "创建")
 	h.add(button)

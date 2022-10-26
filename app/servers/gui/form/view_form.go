@@ -25,6 +25,7 @@ func (f *Form) LabelWidth(v string) {
 	f.AddRep("__FORM_OPT__", "label-width", v)
 }
 
+// AddItems 添加渲染
 func (f *Form) AddItems(base base.RenderBase) {
 	f.AddRender(base, "form-item")
 }

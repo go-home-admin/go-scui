@@ -47,9 +47,7 @@ func (b *Button) Confirm(url string) *ConfirmButton {
 
 func (b *Button) Edit() *DialogButton {
 	formRender := GetForm(b.Context)
-
-	dia := html.NewDialog().SetContext(formRender)
-	b.AddRender(dia)
+	dia := GetEditDialog(b.Context.Gin(), formRender, b)
 
 	dialogButton := &DialogButton{Button: b}
 	b.attr = append(b.attr, `@click="__ID__DialogOpen(row)"`)

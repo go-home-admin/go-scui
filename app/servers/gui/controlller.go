@@ -5,6 +5,23 @@ import (
 	"gorm.io/gorm"
 )
 
+func TryNumberToInt64(i interface{}) int64 {
+	switch i.(type) {
+	case int:
+		return int64(i.(int))
+	case int32:
+		return int64(i.(int32))
+	case uint32:
+		return int64(i.(uint32))
+	case int64:
+		return i.(int64)
+	case uint64:
+		return int64(i.(uint64))
+
+	}
+	return 0
+}
+
 type Gin interface {
 	Gin() *gin.Context
 }
