@@ -176,8 +176,9 @@ func (g *View) NewAction() *RowAction {
 
 // NewSearch 返回搜索栏
 func (g *View) NewSearch() *Search {
+	g.AddData("filterShow", true)
 	f := NewTableSearch(g.gin)
-	g.View.AddRender(f, "search", "filter")
+	g.View.AddRender(f, "search")
 	return f
 }
 
