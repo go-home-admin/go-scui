@@ -8,8 +8,7 @@
         <slot id="header"/>
       </div>
     </el-header>
-    <div v-if="filter.config.length !==0 && filterShow"
-         style="border-bottom:0.8px solid #dcdfe6;background-color: #ffffff;padding: 13px 15px">
+    <div v-if="filterShow" style="border-bottom:0.8px solid #dcdfe6;background-color: #ffffff;padding: 13px 15px">
       <el-container>
         <slot id="search"/>
       </el-container>

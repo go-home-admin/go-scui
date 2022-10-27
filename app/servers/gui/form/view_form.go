@@ -56,9 +56,13 @@ func NewForm() *DialogForm {
 }
 
 func NewTableForm() *Form {
-	view := base.NewView("table_form.vue")
-	return &Form{
-		View:          view,
+	form := &Form{
+		View:          base.NewView("form.vue"),
 		LabelPosition: "right",
+		FormItems:     make([]*gui.FormItems, 0),
+		rules:         map[string]interface{}{},
+		formData:      map[string]interface{}{},
 	}
+	form.AddRep("__FORM_OPT__", "width", "100%")
+	return form
 }
