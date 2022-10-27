@@ -7,16 +7,21 @@ type Dialog struct {
 }
 
 func NewDialog() *Dialog {
-	return &Dialog{
+	d := &Dialog{
 		Render: base.LoadVue("dialog.vue"),
 	}
+	d.Width("50%")
+	return d
 }
 
 func (d *Dialog) GetVisibleName() string {
 	return d.RepID("__ID__visible")
 }
 
-func (d *Dialog) SetContext(b base.RenderBase) *Dialog {
-	d.AddRender(b, "context")
-	return d
+func (d *Dialog) Style(k, v string) {
+	d.AddRep("__OPT__", "style", k, v)
+}
+
+func (d *Dialog) Width(v string) {
+	d.AddRep("__OPT__", "width", v)
 }

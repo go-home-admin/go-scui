@@ -55,8 +55,7 @@ func (b *Button) Delete() *ConfirmButton {
 }
 
 func (b *Button) Edit() *DialogButton {
-	formRender := GetForm(b.Context)
-	dia := GetEditDialog(b.Context.Gin(), formRender, b)
+	dia, formRender := GetEditDialog(b.Context, b)
 
 	dialogButton := &DialogButton{Button: b}
 	b.attr = append(b.attr, `@click="__ID__DialogOpen(row)"`)

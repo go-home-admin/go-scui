@@ -35,18 +35,17 @@ type GuiController interface {
 	Form(f *form.DialogForm)
 }
 
-func GetEditDialog(ctx *gin.Context, form, button base.RenderBase) *html.Dialog {
-	var dia *html.Dialog
-	i, ok := ctx.Get("__gui_edit__")
+func GetEditDialog(g GuiController, button base.RenderBase) (*html.Dialog, *form.DialogForm) {
+	ctx := g.Gin()
+	formRender := GetForm(g)
+	dia := formRender.Dialog
+	_, ok := ctx.Get("__gui_edit__")
 	if !ok {
-		dia = html.NewDialog().SetContext(form)
 		button.AddRender(dia)
-		ctx.Set("__gui_edit__", dia)
-	} else {
-		dia = i.(*html.Dialog)
+		ctx.Set("__gui_edit__", true)
 	}
 
-	return dia
+	return dia, formRender
 }
 
 func GetForm(g GuiController) *form.DialogForm {
@@ -72,12 +71,8 @@ func NewTable(controller GuiController) *View {
 		columns:     make([]*Column, 0),
 		uri:         "",
 	}
-	iniTable(t)
+
 	return t
-}
-
-func iniTable(t *View) {
-
 }
 
 func GetInt(ctx *gin.Context, k string, def int) int {

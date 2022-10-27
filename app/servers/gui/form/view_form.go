@@ -3,6 +3,7 @@ package form
 import (
 	"github.com/go-home-admin/go-admin/app/servers/gui"
 	"github.com/go-home-admin/go-admin/app/servers/gui/base"
+	"github.com/go-home-admin/go-admin/app/servers/gui/html"
 )
 
 type Form struct {
@@ -49,6 +50,16 @@ func (f *Form) Width(v string) {
 
 type DialogForm struct {
 	*Form
+	Dialog *html.Dialog
+}
+
+func (f *DialogForm) Width(v string) *DialogForm {
+	f.Dialog.Width(v)
+	return f
+}
+
+func (f *DialogForm) GetTemplate(pr ...base.RenderBase) string {
+	return f.Dialog.GetTemplate(pr...)
 }
 
 func NewForm() *Form {
@@ -63,20 +74,13 @@ func NewForm() *Form {
 	return form
 }
 
-func (f *DialogForm) Style(k, v string) {
-	f.AddRep("_OPT__", "style", k, v)
-}
-
-func (f *DialogForm) Width(v string) {
-	f.Style("width", v)
-}
-
 func NewDialogForm() *DialogForm {
-	dia := &DialogForm{
-		Form: NewForm(),
+	d := &DialogForm{
+		Form:   NewForm(),
+		Dialog: html.NewDialog(),
 	}
-	dia.Width("60%")
-	return dia
+	d.Dialog.AddRender(d.Form, "context")
+	return d
 }
 
 func NewTableForm() *Form {

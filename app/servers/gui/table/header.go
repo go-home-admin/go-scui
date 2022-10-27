@@ -23,8 +23,7 @@ func (h *Header) add(r base.RenderBase) {
 
 // Create 创建按钮
 func (h *Header) Create() *DialogButton {
-	formRender := GetForm(h.Context)
-	dia := GetEditDialog(h.Context.Gin(), formRender, h)
+	dia, formRender := GetEditDialog(h.Context, h)
 
 	button := NewButton(h.Context, "创建")
 	h.add(button)
