@@ -120,22 +120,38 @@ func (r *Render) GetID() string {
 	return r.id
 }
 
-// AddRep
-// 1, 替换的key, v1="v2"
-// 2, 替换的key, v1
+// AddRep 替换模版内容, 把key替换成
+// 1, (key, v1, "s1", "ss2")		把key替换成v1="s1:ss2; s3:ss3"
+// 2, (key, v1, "s1") 			把key替换成v1="s1" v2="s2"
+// 3, (key, v1) 				把key替换成v1
 func (r *Render) AddRep(k string, v ...string) string {
-	if len(v) == 1 {
+	switch len(v) {
+	case 1: // 把key替换成v1
 		r.templateReplace[k] = v[0]
-	} else {
+	case 2: // 把key替换成v1="s1" v2="s2"
 		if _, ok := r.templateReplace[k]; !ok {
-			r.templateReplace[k] = map[string]string{v[0]: v[1]}
+			r.templateReplace[k] = map[string]interface{}{v[0]: v[1]}
 		} else {
 			switch r.templateReplace[k].(type) {
 			case string:
-				r.templateReplace[k] = map[string]string{v[0]: v[1]}
+				r.templateReplace[k] = map[string]interface{}{v[0]: v[1]}
 			}
-			m := r.templateReplace[k].(map[string]string)
+			m := r.templateReplace[k].(map[string]interface{})
 			m[v[0]] = v[1]
+			r.templateReplace[k] = m
+		}
+	case 3: // (key, v1, "s1", ";")		把key替换成v1="s1; s2"
+		if _, ok := r.templateReplace[k]; !ok {
+			r.templateReplace[k] = map[string]interface{}{v[0]: map[string]string{v[1]: v[2]}}
+		} else {
+			switch r.templateReplace[k].(type) {
+			case string:
+				r.templateReplace[k] = map[string]interface{}{v[0]: map[string]string{v[1]: v[2]}}
+			}
+			m := r.templateReplace[k].(map[string]interface{})
+			mm := m[v[0]].(map[string]string)
+			mm[v[1]] = v[2]
+			m[v[0]] = mm
 			r.templateReplace[k] = m
 		}
 	}
@@ -149,10 +165,19 @@ func (r *Render) RepAll(t string) string {
 		switch i.(type) {
 		case string:
 			t = strings.ReplaceAll(t, s, i.(string))
-		case map[string]string:
+		case map[string]interface{}:
 			str := ""
-			for k3, s3 := range i.(map[string]string) {
-				str += " " + k3 + `="` + s3 + `"`
+			for k3, s3 := range i.(map[string]interface{}) {
+				switch s3.(type) {
+				case string:
+					str += " " + k3 + `="` + s3.(string) + `"`
+				case map[string]string:
+					str2 := ""
+					for k4, s4 := range s3.(map[string]string) {
+						str2 += k4 + `:` + s4 + `; `
+					}
+					str += " " + k3 + `="` + str2 + `"`
+				}
 			}
 			t = strings.ReplaceAll(t, s, str)
 		}

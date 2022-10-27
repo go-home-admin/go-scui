@@ -53,6 +53,7 @@ func (g *GuiContext) Grid(view *table.View) {
 
 func (g *GuiContext) Form(f *form.DialogForm) {
 	f.LabelWidth("80px")
+	f.Width("90%")
 	f.Input("avatar", "头像")
 	f.Input("nickname", "姓名")
 	f.Select("sex", "性别").Options("multiple", "multiple").SelectOptions(gui.SelectOptions{

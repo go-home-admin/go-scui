@@ -34,6 +34,10 @@ func LoadView(file string) string {
 func LoadVue(file string) *Render {
 	fileContent := strings.TrimSpace(LoadView(file))
 
+	return LoadVueString(fileContent)
+}
+
+func LoadVueString(fileContent string) *Render {
 	tStop := strings.LastIndex(fileContent, "\n</template>")
 	if tStop == -1 {
 		panic("你的模版需要存在<template>")

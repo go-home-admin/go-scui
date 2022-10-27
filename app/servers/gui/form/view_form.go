@@ -39,23 +39,19 @@ func (f *Form) OnSubmit(v string) {
 	f.AddMethods("__ID__onSubmit", v)
 }
 
+func (f *Form) Style(k, v string) {
+	f.AddRep("__FORM_OPT__", "style", k, v)
+}
+
+func (f *Form) Width(v string) {
+	f.Style("width", v)
+}
+
 type DialogForm struct {
 	*Form
 }
 
-func NewForm() *DialogForm {
-	return &DialogForm{
-		Form: &Form{
-			View:          base.NewView("form.vue"),
-			LabelPosition: "right",
-			FormItems:     make([]*gui.FormItems, 0),
-			rules:         map[string]interface{}{},
-			formData:      map[string]interface{}{},
-		},
-	}
-}
-
-func NewTableForm() *Form {
+func NewForm() *Form {
 	form := &Form{
 		View:          base.NewView("form.vue"),
 		LabelPosition: "right",
@@ -63,6 +59,27 @@ func NewTableForm() *Form {
 		rules:         map[string]interface{}{},
 		formData:      map[string]interface{}{},
 	}
-	form.AddRep("__FORM_OPT__", "width", "100%")
+	form.Width("100%")
+	return form
+}
+
+func (f *DialogForm) Style(k, v string) {
+	f.AddRep("_OPT__", "style", k, v)
+}
+
+func (f *DialogForm) Width(v string) {
+	f.Style("width", v)
+}
+
+func NewDialogForm() *DialogForm {
+	dia := &DialogForm{
+		Form: NewForm(),
+	}
+	dia.Width("60%")
+	return dia
+}
+
+func NewTableForm() *Form {
+	form := NewForm()
 	return form
 }

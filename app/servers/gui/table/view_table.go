@@ -53,7 +53,7 @@ func GetForm(g GuiController) *form.DialogForm {
 	var f *form.DialogForm
 	i, ok := g.Gin().Get("__gui_form__")
 	if !ok {
-		f = form.NewForm()
+		f = form.NewDialogForm()
 		g.Form(f)
 		g.Gin().Set("__gui_form__", f)
 	} else {
