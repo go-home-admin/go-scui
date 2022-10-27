@@ -7,6 +7,13 @@ type Options struct {
 	Value interface{} `json:"value"`
 }
 
+type FileLists []FileList
+
+type FileList struct {
+	Name string `json:"name"`
+	Url  string `json:"url"`
+}
+
 type FilterOptions []Filter
 
 type Filter struct {

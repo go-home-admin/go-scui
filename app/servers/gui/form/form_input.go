@@ -56,3 +56,8 @@ func (i *InputFormItems) SaveToString() *InputFormItems {
 	i.formItems.SaveToString()
 	return i
 }
+
+func (i *InputFormItems) Options(k, v string) *InputFormItems {
+	i.formItems.Options[k] = v
+	return i
+}

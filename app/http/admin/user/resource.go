@@ -33,10 +33,13 @@ func (g *GuiContext) Grid(view *table.View) {
 	view.Column("性别", "sex").Width("150").Filters([]gui.Filter{{Text: "男", Value: 1}, {Text: "女", Value: 0}})
 	view.Column("邮箱", "email").Width("150")
 	view.Column("注册时间", "created_at").Date().Width("250").Sortable(true)
+	view.Column("城市", "city")
+	view.Column("图片", "image")
+	view.Column("内容", "content")
 
 	action := view.NewAction()
-	action.AddButton("删除").Delete()
-	action.AddButton("编辑").Edit()
+	action.AddButton("删除").Delete().Options("type", "danger")
+	action.AddButton("编辑").Edit().Options("type", "primary")
 
 	// 设置搜索栏
 	filter := view.NewSearch()
@@ -52,11 +55,19 @@ func (g *GuiContext) Form(f *form.DialogForm) {
 	f.LabelWidth("80px")
 	f.Input("avatar", "头像")
 	f.Input("nickname", "姓名")
-	f.Select("sex", "性别").SelectOptions(gui.SelectOptions{
+	f.Select("sex", "性别").Options("multiple", "multiple").SelectOptions(gui.SelectOptions{
 		{Label: "男", Value: 1},
 		{Label: "女", Value: 0},
 	})
 	f.Input("phone", "手机号").SaveToInt()
 	f.Input("email", "邮箱")
 	f.DateTimePicker("created_at", "注册时间")
+	f.CheckBox("city", "城市").Options(gui.SelectOptions{
+		{Label: "广州", Value: "广州"},
+		{Label: "成都", Value: "成都"},
+	})
+	f.File("image", "图片").Options(gui.FileLists{
+		{Name: "ceshi", Url: "https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100"},
+	})
+	f.Input("content", "内容").Options("type", "textarea")
 }

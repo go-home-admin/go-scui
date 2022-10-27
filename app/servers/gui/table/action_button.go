@@ -73,6 +73,11 @@ func (b *Button) Edit() *DialogButton {
 	return dialogButton
 }
 
+func (b *Button) Options(k, v string) {
+	str := k + "=" + "'" + v + "'"
+	b.attr = append(b.attr, str)
+}
+
 func (b *Button) Dialog(render base.RenderBase) *DialogButton {
 	dialog := &DialogButton{
 		Button: b,
