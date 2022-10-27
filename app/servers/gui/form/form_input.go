@@ -61,3 +61,12 @@ func (i *InputFormItems) Options(k, v string) *InputFormItems {
 	i.formItems.Options[k] = v
 	return i
 }
+
+func (i *InputFormItems) Rules(b bool) *InputFormItems {
+	if b {
+		i.formItems.Rules = map[string]string{
+			i.formItems.Name: "[{ required: true, message: '请填写内容' }]",
+		}
+	}
+	return i
+}
