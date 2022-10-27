@@ -56,12 +56,12 @@ func (g *GuiContext) Form(f *form.DialogForm) {
 	f.Width("90%")
 	f.Input("avatar", "头像")
 	f.Input("nickname", "姓名")
-	f.Select("sex", "性别").Options("multiple", "multiple").SelectOptions(gui.SelectOptions{
+	f.Select("sex", "性别").SelectOptions(gui.SelectOptions{
 		{Label: "男", Value: 1},
 		{Label: "女", Value: 0},
 	})
 	f.Input("phone", "手机号").SaveToInt()
-	f.Input("email", "邮箱")
+	f.Input("email", "邮箱").Rules(true)
 	f.DateTimePicker("created_at", "注册时间")
 	f.CheckBox("city", "城市").Options(gui.SelectOptions{
 		{Label: "广州", Value: "广州"},
