@@ -28,7 +28,7 @@ func NewGuiContext(ctx *gin.Context) *GuiContext {
 
 func (g *GuiContext) Grid(view *table.View) {
 	view.Column("ID", "id").Width("80")
-	view.Column("头像", "avatar").Avatar().Width("100")
+	view.Column("头像", "avatar").Image().Width("100")
 	view.Column("姓名", "nickname").Width("150")
 	view.Column("性别", "sex").Width("150").Filters([]gui.Filter{{Text: "男", Value: 1}, {Text: "女", Value: 0}})
 	view.Column("邮箱", "email").Width("150")

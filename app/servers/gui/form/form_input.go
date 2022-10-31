@@ -34,6 +34,7 @@ func (f *Form) Input(prop, label string) *InputFormItems {
 	f.AddFormData(prop, "")
 	f.AddItems(item)
 	f.FormItems = append(f.FormItems, item.formItems)
+	item.AddRep("__options__", item.formItems.GetOpt())
 	return item
 }
 

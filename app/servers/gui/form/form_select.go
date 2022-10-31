@@ -37,6 +37,7 @@ func (f *Form) Select(prop, label string) *SelectFormItems {
 	item.AddRep("__FORM__", item.formID)
 	item.AddRep("__LABEL__", label)
 	item.AddRep("__PROP__", prop)
+	item.AddRep("__options__", item.formItems.GetOpt())
 	return item
 }
 
@@ -46,6 +47,5 @@ func (i *SelectFormItems) SelectOptions(list interface{}) {
 
 func (i *SelectFormItems) Options(k, v string) *SelectFormItems {
 	i.formItems.Options[k] = v
-	i.AddRep("__options__", i.formItems.GetOpt())
 	return i
 }
