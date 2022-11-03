@@ -1,81 +1,81 @@
-# go-admin
-![image](https://github.com/go-home-admin/toolset/blob/main/show.gif)
-#### 介绍
-实践一个高度面向业务的框架，面向业务，应该每个常用服务都是属于开箱即用的的状态，通用服务也使用统一风格提供，可插拔的组件方式封装
-[查看文档](https://learnku.com/docs/go-admin)
+# 实验
 
-#### 软件架构
-软件架构说明
+增删改查全部代码， 包括后台逻辑和前端渲染
 
-
-#### 安装教程
-
-1. mac 安装工具链 make mac-install
-2. 环境变量 copy .env.copy .env
-3. 启动前运行命令, toolset make
-4. 启动go run main.go
-
-#### 使用说明
-
-1.  生成文档: `toolset make:swagger`
-2.  xxxx
-3.  xxxx
-
-#### 参与贡献
-
-1. Fork 本仓库
-2. 新建 Feat_xxx 分支
-3. 提交代码
-4. 新建 Pull Request
-
-## 快速入门
-### 添加新的模块和api
-在home/protobuf创建新的目录admin, 创建proto文件, 同时设置和目录一致的package和option
-~~~~protobuf
-package admin;
-option go_package = "github.com/go-home-admin/home/generate/proto/admin";
-service Public {
-  option (http.RouteGroup) = "admin-public";
-
-  rpc Index(IndexRequest)returns(IndexResponse){
-    option (http.Get) = "/hello";
-  }
-}
 ~~~~
-在这里app/http/kernel.go, 需要注册你的业务前缀, 中间件。
+package user
 
-执行`toolset make`就会生成文档和基础代码, 这时项目已经正启动和访问, 当然访问api只响应基础字段。
+import (
+	"github.com/gin-gonic/gin"
+	"github.com/go-home-admin/go-admin/app/entity/mysql"
+	"github.com/go-home-admin/go-admin/app/servers/gui"
+	"github.com/go-home-admin/go-admin/app/servers/gui/form"
+	"github.com/go-home-admin/go-admin/app/servers/gui/table"
+)
 
-### 引导和依赖注入
-在任意地方声明方法集合时, 加上@Bean就会被框架自动实例
-~~~~go
-// @Bean
-type Controller struct {
-    // logic 会被自动注入, 方法可以直接使用
-    logic *logic.Demo `inject:""`
+// GinHandleResource gin原始路由处理
+func (receiver *Controller) GinHandleResource(ctx *gin.Context) {
+	NewGuiContext(ctx).ActionHandle()
 }
-func (receiver *Controller) Test() {
-    logic.Call()
-}
-~~~~
-如果是在测试文件时, 不在引导流程的的结构体, 也可以正常获得并调用, InitializeNew{你的结构体}Provider是工具生成的
-~~~~go
-func Test_Login(t *testing.T) {
-    InitializeNewControllerProvider().Test()
-}
-~~~~
 
-### 注册自己的服务
-~~~~go
-// @Bean
-type Sms struct {}
-~~~~
-只要任何结构体的字段是Sms类型, 并且使用了inject标签, Sms就可以正常实例化和使用
-~~~~
-// @Bean
-type SmsProviders struct {
-    sms *Sms `inject:""`
+type GuiContext struct {
+	*gui.GinHandle
+	*table.View
 }
-// 如果实现了Init()函数, 还会被自动调用
-func (i *SmsProviders) Init() {}
+
+func NewGuiContext(ctx *gin.Context) *GuiContext {
+	guid := &GuiContext{GinHandle: gui.NewGui(ctx)}
+	guid.View = table.NewTable(guid)
+	guid.SetController(guid)
+	guid.SetDb(mysql.NewOrmUser().GetDB())
+	return guid
+}
+
+func (g *GuiContext) Grid(view *table.View) {
+	view.Column("ID", "id").Width("80")
+	view.Column("头像", "avatar").Image().Width("100")
+	view.Column("姓名", "nickname").Width("150")
+	view.Column("性别", "sex").Width("150").Filters([]gui.Filter{{Text: "男", Value: 1}, {Text: "女", Value: 0}})
+	view.Column("邮箱", "email").Width("150")
+	view.Column("注册时间", "created_at").Date().Width("250").Sortable(true)
+	view.Column("城市", "city")
+	view.Column("图片", "image")
+	view.Column("内容", "content")
+
+	action := view.NewAction()
+	action.AddButton("删除").Delete().Options("type", "danger")
+	action.AddButton("编辑").Edit().Options("type", "primary")
+
+	// 设置搜索栏
+	filter := view.NewSearch()
+	filter.Input("name", "名称")
+	filter.Input("nick", "昵称")
+	filter.Input("sex", "性别")
+
+	header := view.NewHeader()
+	header.Create()
+}
+
+func (g *GuiContext) Form(f *form.DialogForm) {
+	f.LabelWidth("80px")
+
+	f.Input("avatar", "头像")
+	f.Input("nickname", "姓名")
+	f.Select("sex", "性别").SelectOptions(gui.SelectOptions{
+		{Label: "男", Value: 1},
+		{Label: "女", Value: 0},
+	})
+	f.Input("phone", "手机号").SaveToInt()
+	f.Input("email", "邮箱").Rules(true)
+	f.DateTimePicker("created_at", "注册时间")
+	f.CheckBox("city", "城市").Options(gui.SelectOptions{
+		{Label: "广州", Value: "广州"},
+		{Label: "成都", Value: "成都"},
+	})
+	f.File("image", "图片").Options(gui.FileLists{
+		{Name: "ceshi", Url: "https://fuss10.elemecdn.com/3/63/4e7f3a15429bfda99bce42a18cdd1jpeg.jpeg?imageMogr2/thumbnail/360x360/format/webp/quality/100"},
+	})
+	f.Input("content", "内容").Options("type", "textarea")
+}
+
 ~~~~
