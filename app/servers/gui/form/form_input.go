@@ -33,8 +33,8 @@ func (f *Form) Input(prop, label string) *InputFormItems {
 	item.AddRep("__SPAN__", strconv.Itoa(item.formItems.Span))
 	item.AddRep("__FORM__", item.formID+".form")
 	item.AddRep("__component__", item.formItems.Component)
-	item.AddRep("__label__", item.formItems.Name)
-	item.AddRep("__prop__", item.formItems.Component)
+	item.AddRep("__label__", item.formItems.Label)
+	item.AddRep("__prop__", item.formItems.Name)
 	return item
 }
 
