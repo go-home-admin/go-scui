@@ -20,7 +20,7 @@ type Swaager struct {
 func (s *Swaager) Boot() {
 	s.http.GET("/swagger", func(context *gin.Context) {
 		context.Header("Content-Type", "text/html; charset=utf-8")
-		by, err := web.ReadFile("web/index.html")
+		by, err := web.ReadFile("swagger/index.html")
 		if err != nil {
 			context.String(200, "未生成文档, 请执行 toolset make:swagger")
 		} else {
@@ -28,8 +28,8 @@ func (s *Swaager) Boot() {
 		}
 	})
 
-	s.http.GET("/swagger/doc.json", func(context *gin.Context) {
-		by, err := web.ReadFile("web/doc.json")
+	s.http.GET("/swagger.json", func(context *gin.Context) {
+		by, err := web.ReadFile("swagger/swagger.json")
 		if err != nil {
 			context.String(200, "未生成文档, 请执行 toolset make:swagger")
 		} else {
