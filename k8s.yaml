@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: go-scui
-          image: 'registry.cn-hangzhou.aliyuncs.com/ctfang/go-scui:v0.0.2'
+          image: 'registry.cn-hangzhou.aliyuncs.com/ctfang/go-scui:v0.0.4'
           ports:
             - name: http-8080
               containerPort: 8080
