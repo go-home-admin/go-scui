@@ -1,0 +1,50 @@
+kind: Deployment
+apiVersion: apps/v1
+metadata:
+  name: go-scui
+  namespace: 'default'
+  labels:
+    app: go-scui
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: go-scui
+  template:
+    metadata:
+      labels:
+        app: go-scui
+    spec:
+      containers:
+        - name: go-scui
+          image: '{PROJECT_IMAGE}'
+          ports:
+            - name: http-8080
+              containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - name: scui-volume
+              readOnly: true
+              mountPath: /.env
+              subPath: .env
+      imagePullSecrets:
+        - name: alidockerregistryssecret
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: go-scui
+  namespace: 'default'
+  labels:
+    app: go-scui
+spec:
+  ports:
+    - name: http-8080
+      protocol: TCP
+      port: 8080
+      targetPort: 8080
+  selector:
+    app: go-scui
+  type: ClusterIP
+  sessionAffinity: None
