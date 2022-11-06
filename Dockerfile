@@ -23,4 +23,4 @@ FROM alpine:latest AS production
 COPY --from=builder /app/main /main
 ## we can then kick off our newly compiled
 ## binary exectuable!!
-CMD ["sleep", "4600"]
+CMD ["./main"]

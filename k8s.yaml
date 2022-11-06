@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: go-scui
-          image: '{PROJECT_IMAGE}'
+          image: 'registry.cn-hangzhou.aliyuncs.com/ctfang/go-scui:v0.0.0'
           ports:
             - name: http-8080
               containerPort: 8080
@@ -29,7 +29,13 @@ spec:
               subPath: .env
       imagePullSecrets:
         - name: alidockerregistryssecret
-
+      volumes:
+        - name: scui-volume
+          configMap:
+            name: scui-conf
+            items:
+              - key: file
+                path: .env
 ---
 kind: Service
 apiVersion: v1
