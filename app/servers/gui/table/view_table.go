@@ -9,11 +9,11 @@ import (
 	"github.com/go-home-admin/go-admin/app/servers/gui/form"
 	"github.com/go-home-admin/go-admin/app/servers/gui/html"
 	"github.com/go-home-admin/home/app"
+	uuid "github.com/satori/go.uuid"
 	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"os"
 	"strconv"
-	"strings"
 )
 
 type View struct {
@@ -157,7 +157,7 @@ export default {
 		"__methods__", (*g.Render).GetMethods(),
 	})
 	_ = os.MkdirAll("resources/gui/", 0755)
-	err := ioutil.WriteFile("resources/gui/"+strings.ReplaceAll(g.GetUri(), "/", "")+".vue", []byte(vueStr), 0755)
+	err := ioutil.WriteFile("resources/gui/"+uuid.NewV4().String()+".vue", []byte(vueStr), 0755)
 	if err != nil {
 		logrus.Error(err)
 	}

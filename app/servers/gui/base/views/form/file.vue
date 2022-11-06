@@ -1,4 +1,5 @@
 <template>
+  <el-col :span="__SPAN__">
   <el-form-item label="__LABEL__" prop="__PROP__">
     <el-upload
         ref="upload"
@@ -12,6 +13,7 @@
       <div class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
     </el-upload>
   </el-form-item>
+  </el-col>
 </template>
 
 <script>

@@ -100,6 +100,18 @@ type FormItems struct {
 	HideHandle     string                 `json:"hide_handle,omitempty"`
 }
 
+func NewItems(prop, label, component string) *FormItems {
+	return &FormItems{
+		Label:     label,
+		Name:      prop,
+		Span:      24,
+		Component: component,
+		Options: map[string]interface{}{
+			"placeholder": label,
+		},
+	}
+}
+
 func (i *FormItems) GetOpt() string {
 	s := ""
 	for s2, i2 := range i.Options {

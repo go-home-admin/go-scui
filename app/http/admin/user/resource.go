@@ -43,9 +43,9 @@ func (g *GuiContext) Grid(view *table.View) {
 
 	// 设置搜索栏
 	filter := view.NewSearch()
-	filter.Input("name", "名称")
-	filter.Input("nick", "昵称")
-	filter.Input("sex", "性别")
+	filter.Input("name", "名称").Span("5")
+	filter.Input("nick", "昵称").Span("5")
+	filter.Input("sex", "性别").Span("6")
 
 	header := view.NewHeader()
 	header.Create()

@@ -3,6 +3,7 @@ package form
 import (
 	"github.com/go-home-admin/go-admin/app/servers/gui"
 	"github.com/go-home-admin/go-admin/app/servers/gui/base"
+	"strconv"
 )
 
 type SwitchFormItems struct {
@@ -14,20 +15,13 @@ type SwitchFormItems struct {
 // Switch 普通组件
 func (f *Form) Switch(prop, label string) *SwitchFormItems {
 	item := &SwitchFormItems{
-		formID: f.GetID(),
-		Render: base.NewRender(input),
-		formItems: &gui.FormItems{
-			Label:     label,
-			Name:      prop,
-			Component: "el-switch",
-			Options: map[string]interface{}{
-				"active-color":   "#13ce66",
-				"inactive-color": "#ff4949",
-			},
-		},
+		formID:    f.GetID(),
+		Render:    base.NewRender(input),
+		formItems: gui.NewItems(prop, label, "el-switch"),
 	}
 	f.AddFormData(prop, "")
 	f.AddItems(item)
+	item.AddRep("__SPAN__", strconv.Itoa(item.formItems.Span))
 	return item
 }
 
@@ -41,4 +35,9 @@ func (i *SwitchFormItems) GetTemplate(pr ...base.RenderBase) string {
 		"__options__", i.formItems.GetOpt(),
 	})
 	return i.Template
+}
+
+func (i *SwitchFormItems) Span(v string) *SwitchFormItems {
+	i.AddRep("__SPAN__", v)
+	return i
 }

@@ -4,12 +4,15 @@ import (
 	"fmt"
 	"github.com/go-home-admin/go-admin/app/servers/gui"
 	"github.com/go-home-admin/go-admin/app/servers/gui/base"
+	"strconv"
 )
 
 const inputNumber = `
+<el-col :span="__SPAN__">
 <el-form-item label="__label__" prop="__prop__">
 	<el-input-number v-model="__FORM__.__prop__" __options__ clearable />
 </el-form-item>
+</el-col>
 `
 
 type InputNumber struct {
@@ -27,6 +30,7 @@ func (f *Form) InputNumber(prop, label string) *InputNumber {
 		FormItems: &gui.FormItems{
 			Label:     label,
 			Name:      prop,
+			Span:      24,
 			Component: "input-number",
 			Options: map[string]interface{}{
 				"placeholder": prop,
@@ -35,6 +39,7 @@ func (f *Form) InputNumber(prop, label string) *InputNumber {
 		},
 		Form: f,
 	}
+	item.AddRep("__SPAN__", strconv.Itoa(item.FormItems.Span))
 	f.AddFormData(prop, "")
 	f.AddItems(item)
 	return item
@@ -72,5 +77,10 @@ func (i *InputNumber) Step(num int) *InputNumber {
 
 func (i *InputNumber) Controls(b bool) *InputNumber {
 	i.Options[":controls"] = fmt.Sprint(b)
+	return i
+}
+
+func (i *InputNumber) Span(v string) *InputNumber {
+	i.AddRep("__SPAN__", v)
 	return i
 }

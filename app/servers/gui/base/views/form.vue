@@ -1,6 +1,8 @@
 <template>
   <el-form :model="__ID__.form" :rules="__ID__.rules" ref="__ID__Ref" __FORM_OPT__>
-    <slot id="form-item"/>
+    <el-row :gutter="15">
+      <slot id="form-item"/>
+    </el-row>
   </el-form>
 
   <template #footer>

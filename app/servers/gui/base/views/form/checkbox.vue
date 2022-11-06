@@ -1,4 +1,5 @@
 <template>
+  <el-col :span="__SPAN__">
   <el-form-item label="__LABEL__" prop="__PROP__">
     <el-checkbox-group v-model="__FORM__.form.__PROP__" __options__ clearable>
       <el-checkbox
@@ -9,6 +10,7 @@
       </el-checkbox>
     </el-checkbox-group>
   </el-form-item>
+  </el-col>
 </template>
 
 <script>

@@ -1,4 +1,5 @@
 <template>
+  <el-col :span="__SPAN__">
   <el-form-item label="__LABEL__" prop="__PROP__">
     <el-select v-model="__FORM__.form.__PROP__" __options__ clearable>
       <el-option
@@ -9,6 +10,7 @@
       </el-option>
     </el-select>
   </el-form-item>
+  </el-col>
 </template>
 
 <script>
