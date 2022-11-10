@@ -39,6 +39,9 @@ type Create interface {
 type Update interface {
 	Update(ctx *gin.Context)
 }
+type Delete interface {
+	Delete(ctx *gin.Context)
+}
 
 type ToResponse interface {
 	ToResponse() *IndexResponse
@@ -49,6 +52,7 @@ type Paginate interface {
 }
 
 type GetDB interface {
+	TableName() string
 	GetDB() *gorm.DB
 }
 
@@ -57,15 +61,24 @@ type GetPrimary interface {
 }
 
 type ViewDB struct {
-	db *gorm.DB
+	model Model
 }
 
-func (v *ViewDB) SetDb(db *gorm.DB) {
-	v.db = db
+type Model interface {
+	TableName() string
+	GetDB() *gorm.DB
+}
+
+func (v *ViewDB) SetDb(model Model) {
+	v.model = model
 }
 
 func (v *ViewDB) GetDB() *gorm.DB {
-	return v.db
+	return v.model.GetDB()
+}
+
+func (v *ViewDB) TableName() string {
+	return v.model.TableName()
 }
 
 type ViewPrimary struct {

@@ -18,11 +18,6 @@
       <scTable ref="table" tableName="listCustomColumn" :apiObj="getData" :column="columns" row-key="id" stripe>
         <el-table-column type="selection" width="50"></el-table-column>
         <slot id="el-table-column"/>
-        <el-table-column label="操作" fixed="right" align="right" width="300">
-          <template #default="{row}">
-            <slot id="actions"/>
-          </template>
-        </el-table-column>
       </scTable>
     </el-main>
   </el-container>

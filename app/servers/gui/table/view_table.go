@@ -165,7 +165,18 @@ export default {
 
 // NewAction 列操作
 func (g *View) NewAction() *RowAction {
-	action := &RowAction{Context: g.Controller, t: g}
+	action := &RowAction{
+		Render: base.NewRender(`
+        <el-table-column label="操作" fixed="right" align="right" width="__column__width">
+          <template #default="{row}">
+            <slot id="actions"/>
+          </template>
+        </el-table-column>`),
+		Context: g.Controller,
+		t:       g,
+	}
+	action.Width("160")
+	g.AddRender(action, "el-table-column")
 	return action
 }
 

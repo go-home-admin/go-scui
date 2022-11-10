@@ -1,15 +1,59 @@
 package system
 
 import (
+	"encoding/json"
 	gin "github.com/gin-gonic/gin"
+	"github.com/go-home-admin/go-admin/app/entity/mysql"
 	admin "github.com/go-home-admin/go-admin/generate/proto/admin"
 	http "github.com/go-home-admin/home/app/http"
 )
 
-// MyMenu   登陆用户的菜单
+// MyMenu   登陆
 func (receiver *Controller) MyMenu(req *admin.MyMenuRequest, ctx http.Context) (*admin.MyMenuResponse, error) {
-	// TODO 这里写业务
-	return &admin.MyMenuResponse{}, nil
+	menus := make(map[uint32]*admin.Menu)
+	list := mysql.NewOrmAdminMenu().Order("id").Get()
+
+	for _, menu := range list {
+		meta := &admin.Meta{}
+		if menu.Meta != "" {
+			json.Unmarshal([]byte(menu.Meta), meta)
+		}
+		menus[menu.Id] = &admin.Menu{
+			Path:      *menu.Path,
+			Name:      menu.Name,
+			Meta:      meta,
+			Component: menu.Component,
+			Children:  make([]*admin.Menu, 0),
+		}
+
+		if menu.ParentId != 0 {
+			m, mok := menus[menu.Id]
+			if mok {
+				p, pok := menus[menu.ParentId]
+				if pok {
+					p.Children = append(p.Children, m)
+				}
+			}
+		}
+	}
+	got := make([]*admin.Menu, 0)
+	for _, menu := range list {
+		if menu.ParentId == 0 {
+			got = append(got, menus[menu.Id])
+		}
+	}
+
+	return &admin.MyMenuResponse{
+		Menu: got,
+		Permissions: []string{
+			"list.add",
+			"list.edit",
+			"list.delete",
+			"user.add",
+			"user.edit",
+			"user.delete",
+		},
+	}, nil
 }
 
 // GinHandleMyMenu gin原始路由处理

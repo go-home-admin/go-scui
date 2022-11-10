@@ -22,6 +22,7 @@ func (f *Form) GetFormItems() []*gui.FormItems {
 	return f.FormItems
 }
 
+// LabelWidth 需要带上单位px, 或者其他格式
 func (f *Form) LabelWidth(v string) {
 	f.AddRep("__FORM_OPT__", "label-width", v)
 }

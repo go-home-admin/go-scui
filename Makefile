@@ -21,11 +21,14 @@ make-route:
 make-swagger:
 	toolset make:swagger -out_route=@root/web/swagger/swagger.json
 
+make-js:
+	toolset make:js -in=@root/web/swagger/swagger.json -tag=admin
+
 make-bean:
 	toolset make:bean
 
 # 生成全部
-gen:bin/protoc-linux make-orm make-route make-bean make-swagger
+gen:bin/protoc-linux make-orm make-route make-bean make-swagger make-js
 
 # 调试启动
 dev:gen

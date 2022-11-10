@@ -47,11 +47,13 @@ func (b *Button) Confirm(url string) *ConfirmButton {
 }
 
 func (b *Button) Delete() *ConfirmButton {
+	url := b.Context.Gin().Request.URL.Path + "/del"
+
 	if c, ok := b.Context.(gui.GetPrimary); ok {
-		return b.Confirm("/del?id={{ row." + c.GetPrimary() + " }}")
+		return b.Confirm(url + "?id={{ row." + c.GetPrimary() + " }}")
 	}
 
-	return b.Confirm("/del?id={{ row.id }}")
+	return b.Confirm(url + "?id={{ row.id }}")
 }
 
 func (b *Button) Edit() *DialogButton {

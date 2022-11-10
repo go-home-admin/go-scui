@@ -51,10 +51,10 @@ func (g *GinHandle) ActionHandle() {
 			g.Update(g.Context)
 		}
 	case "del": // edit
-		if i, ok := g.Controller.(Update); ok {
-			i.Update(g.Context)
+		if i, ok := g.Controller.(Delete); ok {
+			i.Delete(g.Context)
 		} else {
-			g.Update(g.Context)
+			g.Delete(g.Context)
 		}
 	default:
 		http.NewContext(g.Context).Fail(errors.New("不支持的路由"))
@@ -130,6 +130,25 @@ func (g *GinHandle) Update(ctx *gin.Context) {
 	http.NewContext(ctx).Success(nil)
 }
 
+func (g *GinHandle) Delete(ctx *gin.Context) {
+	primary := g.Controller.(GetPrimary).GetPrimary()
+	var primaryVal interface{}
+	primaryVal, ok := ctx.GetQuery(primary)
+	if !ok {
+		logrus.Error("必须要有主键数据才能删除, 当前的主建=" + primary)
+		return
+	}
+	_ = primaryVal
+	model := g.Controller.(GetDB)
+	td := model.GetDB().Delete(model, primaryVal)
+	if td.Error != nil {
+		logrus.Error(td.Error)
+		http.NewContext(ctx).Fail(errors.New("删除失败"))
+		return
+	}
+
+	http.NewContext(ctx).Success(nil)
+}
 func (g *GinHandle) getData(ctx *gin.Context) (map[string]interface{}, map[string]interface{}) {
 	by, _ := ctx.GetRawData()
 	var m map[string]interface{}

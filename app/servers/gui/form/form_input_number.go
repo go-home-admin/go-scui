@@ -8,7 +8,7 @@ import (
 )
 
 const inputNumber = `
-<el-col :span="__SPAN__">
+<el-col span="__SPAN__">
 <el-form-item label="__label__" prop="__prop__">
 	<el-input-number v-model="__FORM__.__prop__" __options__ clearable />
 </el-form-item>

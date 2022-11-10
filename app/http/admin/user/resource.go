@@ -22,7 +22,7 @@ func NewGuiContext(ctx *gin.Context) *GuiContext {
 	guid := &GuiContext{GinHandle: gui.NewGui(ctx)}
 	guid.View = table.NewTable(guid)
 	guid.SetController(guid)
-	guid.SetDb(mysql.NewOrmUser().GetDB())
+	guid.SetDb(mysql.NewOrmUser())
 	return guid
 }
 

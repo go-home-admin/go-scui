@@ -5,9 +5,15 @@ import (
 )
 
 type RowAction struct {
+	*base.Render
 	Context GuiController
 
 	t *View
+}
+
+func (r *RowAction) Width(V string) *RowAction {
+	r.AddRep("__column__width", V)
+	return r
 }
 
 func (r *RowAction) AddButton(text string) *Button {

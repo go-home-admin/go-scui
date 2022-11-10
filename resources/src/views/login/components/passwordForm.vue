@@ -31,7 +31,7 @@
 </template>
 
 <script>
-	import {getMenu} from "@/api/model/menu";
+	import {SystemMenuMyGet} from "@/api/swagger_gen";
 
 	export default {
 		data() {
@@ -91,7 +91,7 @@
 					return false
 				}
 				//获取菜单
-				var menu = getMenu()
+				var menu = await SystemMenuMyGet()
 
 				if(menu.code == 200){
 					if(menu.data.menu.length==0){

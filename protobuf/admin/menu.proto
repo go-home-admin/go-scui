@@ -1,0 +1,14 @@
+// @Tag("binding","required")
+syntax = "proto3";
+
+package admin;
+
+import "http_config.proto";
+
+option go_package = "github.com/go-home-admin/go-admin/generate/proto/admin";
+
+service Menu {
+	option (http.RouteGroup) = "admin";
+
+	option (http.Resource) = "/menu";
+}

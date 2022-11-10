@@ -59,6 +59,11 @@ func (i *InputFormItems) Options(k, v string) *InputFormItems {
 	return i
 }
 
+func (i *InputFormItems) Placeholder(v string) *InputFormItems {
+	i.formItems.Options["placeholder"] = v
+	return i
+}
+
 func (i *InputFormItems) Span(v string) *InputFormItems {
 	i.AddRep("__SPAN__", v)
 	return i
