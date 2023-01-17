@@ -28,7 +28,7 @@ make-bean:
 	toolset make:bean
 
 # 生成全部
-gen:bin/protoc-linux make-orm make-route make-bean make-swagger make-js
+gen:protoc make-orm make-route make-bean make-swagger make-js
 
 # 调试启动
 dev:gen

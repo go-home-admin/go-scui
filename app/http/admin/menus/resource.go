@@ -1,4 +1,4 @@
-package menu
+package menus
 
 import (
 	"encoding/json"

@@ -7,7 +7,8 @@ go 1.18
 
 require (
 	github.com/gin-gonic/gin v1.7.7
-	github.com/go-home-admin/home v0.4.15
+	github.com/go-home-admin/home v0.5.2
+	github.com/satori/go.uuid v1.2.0
 	github.com/sirupsen/logrus v1.8.1
 	google.golang.org/protobuf v1.28.1
 	gorm.io/gorm v1.23.4
@@ -38,7 +39,6 @@ require (
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/robfig/cron/v3 v3.0.0 // indirect
 	github.com/rogpeppe/go-internal v1.8.1 // indirect
-	github.com/satori/go.uuid v1.2.0 // indirect
 	github.com/ugorji/go/codec v1.2.7 // indirect
 	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d // indirect
 	golang.org/x/sys v0.0.0-20220406163625-3f8b81556e12 // indirect

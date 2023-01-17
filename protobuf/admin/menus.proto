@@ -7,7 +7,7 @@ import "http_config.proto";
 
 option go_package = "github.com/go-home-admin/go-admin/generate/proto/admin";
 
-service Menu {
+service Menus {
 	option (http.RouteGroup) = "admin";
 
 	option (http.Resource) = "/menu";
