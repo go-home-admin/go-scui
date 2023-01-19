@@ -42,6 +42,7 @@ func (f *Form) InputNumber(prop, label string) *InputNumber {
 	item.AddRep("__SPAN__", strconv.Itoa(item.FormItems.Span))
 	f.AddFormData(prop, "")
 	f.AddItems(item)
+	f.FormItems = append(f.FormItems, item.FormItems)
 	return item
 }
 

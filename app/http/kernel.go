@@ -15,7 +15,6 @@ type Kernel struct {
 func (k *Kernel) Init() {
 	// 全局中间件
 	k.Middleware = []gin.HandlerFunc{
-		gin.Recovery(),
 		Cors(),
 	}
 

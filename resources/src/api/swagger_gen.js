@@ -23,7 +23,7 @@ export async function LogoutPost() {
 /**
  *  登陆
  * @param {{username?:string,password?:string}} data
- * @returns {Promise<{code:Number,data:{token:string,userInfo:},message:string}>}
+ * @returns {Promise<{code:Number,data:{userInfo:,token:string},message:string}>}
  * @callback
  */
 export async function TokenPost(data) {
@@ -53,7 +53,7 @@ export async function AdminUserDelete(data) {
 /**
  *  登陆账户信息
  * @param {{id?:number}} data
- * @returns {Promise<{code:Number,data:{avatar:string,introduction:string,name:string,roles:{}[]},message:string}>}
+ * @returns {Promise<{code:Number,data:{roles:{}[],avatar:string,introduction:string,name:string},message:string}>}
  * @callback
  */
 export async function InfoGet(data) {
@@ -72,7 +72,7 @@ export async function SystemMenuDelDelete(data) {
 
 /**
  *  菜单列表
- * @returns {Promise<{code:Number,data:{list:{active:string,apiList:{code:string,url:string}[],children:{}[],component:string,id:number,name:string,meta:,parentId:number,path:string,redirect:string}[]},message:string}>}
+ * @returns {Promise<{code:Number,data:{list:{component:string,parentId:number,name:string,path:string,redirect:string,active:string,apiList:{code:string,url:string}[],children:{}[],id:number,meta:}[]},message:string}>}
  * @callback
  */
 export async function SystemMenuListGet() {
@@ -81,7 +81,7 @@ export async function SystemMenuListGet() {
 
 /**
  *  登陆用户的菜单
- * @returns {Promise<{code:Number,data:{menu:{meta:,name:string,path:string,children:{}[],component:string}[],permissions:{}[]},message:string}>}
+ * @returns {Promise<{code:Number,data:{menu:{children:{}[],component:string,meta:,name:string,path:string}[],permissions:{}[]},message:string}>}
  * @callback
  */
 export async function SystemMenuMyGet() {

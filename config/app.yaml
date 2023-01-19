@@ -1,6 +1,6 @@
 name: admin-home
 debug: true
-url: env("URL", "http://127.0.0.1:8080")
+url: env("URL", "http://127.0.0.1:8888")
 
 servers:
   http:

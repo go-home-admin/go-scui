@@ -12,3 +12,4 @@ service Menus {
 
 	option (http.Resource) = "/menu";
 }
+

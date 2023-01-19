@@ -105,7 +105,7 @@ func (g *GinHandle) Create(ctx *gin.Context) {
 }
 
 func (g *GinHandle) Update(ctx *gin.Context) {
-	data, all := g.getData(ctx)
+	data, all := g.GetFromData(ctx)
 	primary := g.Controller.(GetPrimary).GetPrimary()
 	primaryValStringOrFloat64, ok := all[primary]
 	if !ok {
@@ -149,7 +149,7 @@ func (g *GinHandle) Delete(ctx *gin.Context) {
 
 	http.NewContext(ctx).Success(nil)
 }
-func (g *GinHandle) getData(ctx *gin.Context) (map[string]interface{}, map[string]interface{}) {
+func (g *GinHandle) GetFromData(ctx *gin.Context) (map[string]interface{}, map[string]interface{}) {
 	by, _ := ctx.GetRawData()
 	var m map[string]interface{}
 	err := json.Unmarshal(by, &m)

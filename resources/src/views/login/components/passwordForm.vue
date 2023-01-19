@@ -31,7 +31,7 @@
 </template>
 
 <script>
-	import {SystemMenuMyGet} from "@/api/swagger_gen";
+import {LoginPost, SystemMenuMyGet} from "@/api/swagger_gen";
 
 	export default {
 		data() {
@@ -79,7 +79,7 @@
 					password: this.$TOOL.crypto.MD5(this.form.password)
 				}
 				//获取token
-				var user = await this.$API.auth.token.post(data)
+				var user = await LoginPost(data)
 				if(user.code == 200){
 					this.$TOOL.cookie.set("TOKEN", user.data.token, {
 						expires: this.form.autologin? 24*60*60 : 0

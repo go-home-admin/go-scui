@@ -7,6 +7,8 @@ import (
 	"github.com/go-home-admin/go-admin/app/servers/gui"
 	"github.com/go-home-admin/go-admin/app/servers/gui/form"
 	"github.com/go-home-admin/go-admin/app/servers/gui/table"
+	"github.com/go-home-admin/home/app/http"
+	"github.com/go-home-admin/home/bootstrap/services/database"
 )
 
 // GinHandleResource gin原始路由处理
@@ -60,4 +62,23 @@ func (g *GuiContext) Form(f *form.DialogForm) {
 	f.InputNumber("parent_id", "父级")
 	f.Input("component", "组件").Placeholder("guid/index")
 	f.Input("path", "地址")
+}
+
+func (g *GuiContext) Update(ctx *gin.Context) {
+	data, all := g.GetFromData(ctx)
+	primary := all["id"].(float64)
+
+	oldData, _ := mysql.NewOrmAdminMenu().WhereId(uint32(primary)).First()
+	mate := map[string]interface{}{}
+	json.Unmarshal([]byte(oldData.Meta), &mate)
+	mate["title"] = data["meta_title"]
+	mateStr, _ := json.Marshal(mate)
+	mysql.NewOrmAdminMenu().WhereId(uint32(primary)).Updates(mysql.AdminMenu{
+		ParentId:  uint32(data["parent_id"].(float64)),
+		Component: data["component"].(string),
+		Path:      database.StrPointer(data["path"].(string)),
+		Meta:      string(mateStr),
+	})
+
+	http.NewContext(ctx).Success(nil)
 }
